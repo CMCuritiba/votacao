@@ -1,0 +1,10 @@
+# Test dependencies go here.
+-r base.txt
+
+coverage
+django-test-plus
+factory-boy
+
+# pytest
+pytest-django
+pytest-sugar
