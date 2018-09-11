@@ -57,7 +57,7 @@ THIRD_PARTY_APPS = [
 
 # Apps specific for this project go here.
 LOCAL_APPS = [
-    #'votacao.api.apps.ApiConfig',
+    'votacao.api.apps.ApiConfig',
     'votacao.votacao.apps.VotacaoConfig',
 ]
 
@@ -182,6 +182,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'django_settings_export.settings_export',
                 # Your stuff: custom template context processors go here
             ],
         },
@@ -307,10 +308,11 @@ PIPELINE = {
               'datatables/media/css/jquery.dataTables.css',
               'datatables/media/css/dataTables.bootstrap.css',
               'datatables.net-responsive-bs/css/responsive.bootstrap.min.css',
-              'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
-              'fullcalendar/dist/fullcalendar.min.css',
+              #'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
+              #'fullcalendar/dist/fullcalendar.min.css',
               'callout.css',
-              'event.css',
+              'estilos.css',
+              #'event.css',
             ),
             'output_filename': 'css/master.css',
         },
@@ -319,8 +321,8 @@ PIPELINE = {
         'master': {
             'source_filenames': (
               'jquery/jquery.js',
-              'moment/min/moment.min.js',
-              'moment/locale/pt-br.js',
+              #'moment/min/moment.min.js',
+              #'moment/locale/pt-br.js',
               'bootstrap/dist/js/bootstrap.min.js',
               'underscore/underscore-min.js',
               #'bootstrap-calendar/js/language/pt-BR.js',
@@ -332,10 +334,10 @@ PIPELINE = {
               'datatables/media/js/dataTables.bootstrap.js',
               'datatables.net-responsive/js/dataTables.responsive.min.js',
               'datatables.net-responsive-bs/js/responsive.bootstrap.min.js',
-              'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
-              'fullcalendar/dist/fullcalendar.min.js',
-              'fullcalendar/dist/gcal.min.js',
-              'fullcalendar/dist/locale-all.min.js',
+              #'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
+              #'fullcalendar/dist/fullcalendar.min.js',
+              #'fullcalendar/dist/gcal.min.js',
+              #'fullcalendar/dist/locale-all.min.js',
             ),
             'output_filename': 'js/master.js',
         }
@@ -353,20 +355,21 @@ BOWER_INSTALLED_APPS = (
     'jquery#1.9.1',
     #'jquery',
     'underscore',
-    'bootstrap',
+    'bootstrap#3',
     #'bootstrap-calendar',
     #'jasny-bootstrap',
     'datatables',
     'datatables-bootstrap3',
     'bootstrap-3-datepicker',
     'bootstrap-datepicker',
-    'eonasdan-bootstrap-datetimepicker#latest',
-    'bootstrap3-datetimepicker',
+    'datatables.net-responsive-bs',
+    #'eonasdan-bootstrap-datetimepicker#latest',
+    #'bootstrap3-datetimepicker',
     #'vue',
     #'vue-strap',
     'fontawesome',
-    'moment',
-    'fullcalendar',
+    #'moment',
+    #'fullcalendar',
     #'bootstrap-select'
 )
 
@@ -413,3 +416,7 @@ TINYMCE_DEFAULT_CONFIG = {
     'width': 'auto',
     'height': 360,
 }
+
+SETTINGS_EXPORT = [
+    'MSCMC_SERVER',
+]

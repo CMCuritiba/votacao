@@ -1,0 +1,129 @@
+# -*- coding: utf-8 -*-
+
+from django.conf import settings
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import viewsets
+from datetime import datetime
+from django.http import JsonResponse
+from django.conf import settings
+
+from votacao.votacao.forms import JSONVotacaoForm
+from votacao.votacao.models import Votacao
+
+import json
+import requests
+
+import urllib.request
+
+# -----------------------------------------------------------------------------------
+# chamada API para abrir um projeto para votação
+# -----------------------------------------------------------------------------------
+def abre_votacao(request, pac_id, par_id, codigo_projeto):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar abrir projeto para votação'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		if (par_id != None):
+			try:
+				votacao = Votacao.objects.get(par_id=par_id)
+				votacao.status = 'A'
+				votacao.save()
+			except Votacao.DoesNotExist:
+				votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
+			response = JsonResponse({'status':'true','message':'Projeto foi aberto para votação'}, status=200)
+	return response
+
+# -----------------------------------------------------------------------------------
+# chamada API para verificar se existe algum projeto aberto
+# -----------------------------------------------------------------------------------
+def verifica_abertos(request):
+	response = JsonResponse({'status':'false','message':'Já existe projeto para votação aberto'}, status=404)
+
+	abertas = Votacao.objects.filter(status='A')
+	if abertas.count() <= 0:
+		response = JsonResponse({'status':'true','message':'Nenhum projeto aberto para votação'}, status=200)
+	return response
+
+# -----------------------------------------------------------------------------------
+# chamada API para retornar status do projeto
+# -----------------------------------------------------------------------------------
+def consome_projetos(request, pac_id):
+
+	array_json=[]
+	if (pac_id != None):
+		search_url = '{}/api/spl/projetos_reuniao/{}/'.format(settings.MSCMC_SERVER, pac_id)
+		r = requests.get(search_url)
+		projetos = r.json()
+		for projeto in projetos:
+			array_json.append(formata_projeto(projeto))
+	return JsonResponse(array_json, safe=False)		
+
+# -----------------------------------------------------------------------------------
+# método auxiliar para formatação dos projetos
+# -----------------------------------------------------------------------------------
+def formata_projeto(projeto):
+	ejson = {}
+	try:
+		votacao = Votacao.objects.get(par_id=projeto['par_id'])
+		ejson['status'] = votacao.status
+	except Votacao.DoesNotExist:
+		ejson['status'] = 'F'
+	ejson['pac_id'] = projeto['pac_id']
+	ejson['par_id'] = projeto['par_id']
+	ejson['iniciativa'] = projeto['iniciativa']
+	ejson['relator'] = projeto['relator']
+	ejson['conclusao_relator'] = projeto['conclusao_relator']
+	ejson['conclusao_comissao'] = projeto['conclusao_comissao']
+	ejson['tem_emendas'] = projeto['tem_emendas']
+	ejson['sumula'] = projeto['sumula']
+	ejson['codigo_proposicao'] = projeto['codigo_proposicao']
+	return ejson
+
+# -----------------------------------------------------------------------------------
+# chamada API para fechar um projeto para votação
+# -----------------------------------------------------------------------------------
+def fecha_votacao(request, pac_id, par_id, codigo_projeto):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar fechar projeto para votação'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		if (par_id != None):
+			votacao = Votacao.objects.get(par_id=par_id)
+			votacao.status = 'V'
+			votacao.save()
+			response = JsonResponse({'status':'true','message':'Projeto foi aberto para votação'}, status=200)
+	return response	
+
+# -----------------------------------------------------------------------------------
+# chamada API para retornar projetos abertos para votação
+# -----------------------------------------------------------------------------------
+def retorna_aberto(request):
+
+	result_json = []
+	ejson = {}
+	try:
+		projeto = Votacao.objects.filter(status='A')[0]
+	except IndexError:
+		projeto = None
+	if projeto:
+		search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(settings.MSCMC_SERVER, projeto.pac_id, projeto.par_id)
+		r = requests.get(search_url)
+		projeto = r.json()
+		try :
+			ejson['pac_id'] = projeto[0]['pac_id']
+			ejson['par_id'] = projeto[0]['par_id']
+			ejson['iniciativa'] = projeto[0]['iniciativa']
+			ejson['relator'] = projeto[0]['relator']
+			ejson['conclusao_relator'] = projeto[0]['conclusao_relator']
+			ejson['conclusao_comissao'] = projeto[0]['conclusao_comissao']
+			ejson['tem_emendas'] = projeto[0]['tem_emendas']
+			ejson['sumula'] = projeto[0]['sumula']
+			ejson['codigo_proposicao'] = projeto[0]['codigo_proposicao']
+			result_json.append(ejson)
+		except:
+			pass
+		
+	print(result_json)
+	return JsonResponse(result_json, safe=False)

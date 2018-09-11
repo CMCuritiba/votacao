@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        {% load pipeline %}
+        {% stylesheet 'master' %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
+    <body>
+
+    <div class="container">
+    <div class="starter-template">
+        <div class="bs-callout bs-callout-primary">
+            <h4>{% block title %}Seja bem vindo, {{ user.first_name }}{% endblock %}</h4>
+        </div>
+
+        {% for message in messages %}
+            {% if 'success' in message.tags %}
+                <div class="alert alert-success">
+                    <p>{{ message }}</p>
+                </div>
+            {% endif %}
+            {% if 'error' in message.tags %}
+                <div class="alert alert-danger">
+                    <p>{{ message }}</p>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% block content %}{% endblock content %}
+      </div>
+    </div>
+
+    {% javascript 'master' %}
+    
+    {% block extra_javascript %}
+
+    {% endblock %}
+  </body>
+</html>
+

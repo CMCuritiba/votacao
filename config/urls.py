@@ -11,9 +11,10 @@ from django.views.generic import TemplateView
 from django.contrib.messages.views import SuccessMessageMixin
 
 urlpatterns = [
-    re_path(settings.ADMIN_URL, admin.site.urls),
+    #re_path(settings.ADMIN_URL, admin.site.urls),
     re_path(r'^autentica/', include('autentica.urls')),
-    #re_path(r'^api/', include('calendario.api.urls')),
+    re_path(r'^admin/', include('votacao.votacao.urls')),
+    re_path(r'^api/', include('votacao.api.urls')),
     #re_path(r'^calendario/', include('calendario.calendario.urls')),
     #re_path(r'^tinymce/', include('tinymce.urls')),
 

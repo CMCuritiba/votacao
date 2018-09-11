@@ -1,0 +1,185 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Manutenção de Pautas{% endblock %}
+
+{% block content %}
+
+	<div class="panel panel-info">
+        <div class="panel-heading">Opções de Filtro</div>
+        <div class="panel-body">
+        	<div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class='input-group date' id='datepicker1'>
+                            <input type='text' class="form-control" placeholder="Data Início" data-live-search="true" data-width="50%" id="id_filtro_data_inicio" name="id_filtro_data_inicio"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar dateinput"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class='input-group date' id='datepicker2'>
+                            <input type='text' class="form-control" placeholder="Data Fim" data-live-search="true" data-width="50%" id="id_filtro_data_fim" name="id_filtro_data_fim"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar dateinput"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>           
+	</div>           
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">Pautas</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <table id="tpautas" class="table table-striped table-hover table-bordered fonteTable" width="100%" cellspacing="0"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-primary">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <button type="button" class="btn btn-primary" onclick="javascript:criaPauta();">Nova</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}    
+
+{% block extra_javascript %}
+
+    <script>
+        var tablePautas;
+
+        $(document).ready(function() {
+
+            $('#datepicker1').datepicker({
+                format: "dd/mm/yyyy",
+                language: "pt-BR",
+                todayHighlight: true,
+                clearBtn: false,
+                autoclose: true,
+                orientation: "bottom left",
+            });
+
+            $('#datepicker2').datepicker({
+                format: "dd/mm/yyyy",
+                language: "pt-BR",
+                todayHighlight: true,
+                clearBtn: false,
+                autoclose: true,
+                orientation: "bottom left",
+            });
+
+            tablePautas = $('#tpautas').DataTable({
+                responsive: true,
+                "order": [[ 2, "asc" ]],
+                "columns": [
+                    { 
+                        title: "ID" ,
+                        data: 'id'
+                    },
+                    { 
+                        title: "Data",
+                        data: 'data',
+                        render: function(data, type, full, meta) {
+                            return '<a href="/calendario/evento/altera/' + full.id + '">' + data + '</a>';
+                        }
+                    },
+                    { 
+                        title: "Título",
+                        data: 'titulo',
+                        render: function(data, type, full, meta) {
+                            return '<a href="/calendario/evento/altera/' + full.id + '">' + data + '</a>';
+                        }
+                    },
+                    
+                ],
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [1],
+                        "visible": true,
+                        "searchable": true
+                    },
+                    {
+                        "targets": [2],
+                        "visible": true,
+                        "searchable": true
+                    },
+                    {
+                        "targets": [3],
+                        "visible": true,
+                        "searchable": false,
+                        "className": "dt-center",
+                        "data": null,
+                        render: function(data, type, full, meta) {
+                            /*
+                            if (full.status == 'ATIVO') {
+                                return '<a href="" data-toggle="modal" data-target="#confirmaModal" data-evento_id="' + full.id + '" data-evento_evento="' + full.evento + '" data-evento_inicio="' + full.inicio + '" data-evento_fim="' + full.fim + '"><i class="far fa-trash-alt" aria-hidden="true" style="color:Tomato;" title="Exclui Evento"></i></a>';
+                            }
+                            else {
+                                return '';
+                            }
+                            */
+                            return 'ZACA';
+                        }
+                    },
+                            
+
+                ],
+                "language": {
+                    "info": "Páginas _PAGE_ de _PAGES_",
+                    "emptyTable": "Sem dados para mostrar",
+                    "decimal": ",",
+                    "thousands": ".",
+                    "oPaginate": {
+                        "sFirst": '<span class="glyphicon glyphicon-fast-backward"></span>',
+                        "sLast": '<span class="glyphicon glyphicon-fast-forward"></span>',
+                        "sNext": '<span class="glyphicon glyphicon-forward"></span>',
+                        "sPrevious": '<span class="glyphicon glyphicon-backward"></span>'
+                    }
+                },
+                "deferRender": true,
+                "bPaginate" : true,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bInfo": false,
+                "ajax": {
+                    "url": "/api/get_pautas/",
+                    "dataSrc": "",
+                },
+                "sDom": '<"top"i>rt<"bottom"lp><"clear">',
+            });
+            
+            $.fn.dataTableExt.afnFiltering.push(
+                function( oSettings, aData, iDataIndex ) {
+                    console.log(aData);
+                    return true;
+                }
+            );
+        });
+
+        $('#id_filtro_data_inicio').change( function() { 
+            tablePautas.draw(); 
+        } );
+
+        $('#id_filtro_data_fim').change( function() { 
+            tablePautas.draw(); 
+        } );
+    </script>
+
+{% endblock %}

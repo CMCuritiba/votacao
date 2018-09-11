@@ -1,0 +1,89 @@
+{% extends "base_vereador.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+
+<div class="panel panel-primary">
+    <div id="projeto" class="panel-heading"></div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h2 id="iniciativa"></h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3 id="ementa"></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="jumbotron text-center" id="botoes">
+</div>
+
+{% endblock %}    
+
+
+{% block extra_javascript %}
+
+    <script>
+
+        $(document).ready(function() {
+
+            var tim = setInterval(function() {
+                atualiza_votacao();                
+            }, 500);
+        });
+
+        function atualiza_votacao() {
+            request_url = '/api/retorna_aberto/';
+
+            $.ajax({
+                url: request_url,
+                type: 'GET',
+                accepts: 'application/json',
+                dataType: 'json',
+                success: function(result){
+                    if (result.length > 0) {
+                        limpaCampos();
+                        carregaCampos(result);
+                        montaBotoes();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Problema ao carregar informações do projeto.');
+                }
+            })
+        }
+
+        function limpaCampos() {
+            $('#projeto').empty();
+            $('#iniciativa').empty();
+            $('#ementa').empty();
+        }
+
+        function carregaCampos(result) {
+            $('#projeto').append('<h1>' + result[0].codigo_proposicao + '</h1>');
+            $('#iniciativa').append('Iniciativa: ' + result[0].iniciativa);
+            $('#ementa').append(result[0].sumula);
+        }
+
+        function montaBotoes() {
+            $('#botoes').empty();
+            $('#botoes').append('<button type="button" class="btn btn-success btn-lg botao"> FAVORÁVEL </button>');
+            $('#botoes').append('<button type="button" class="btn btn-warning btn-lg botao"> FAVORÁVEL COM RESTRIÇÕES </button>');
+            $('#botoes').append('<button type="button" class="btn btn-danger btn-lg botao"> CONTRÁRIO </button>');
+            $('#botoes').append('<br/>');
+            $('#botoes').append('<br/>');
+            $('#botoes').append('<button type="button" class="btn btn-primary btn-lg botao"> ABSTENÇÃO </button>');
+            $('#botoes').append('<button type="button" class="btn btn-info btn-lg botao"> VISTA </button>');
+        }
+
+    </script>
+
+{% endblock %}

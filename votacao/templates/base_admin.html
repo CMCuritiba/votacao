@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+ <html lang="pt-BR">
+ <head>
+    {% load pipeline %}
+    {% stylesheet 'master' %}
+  <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+ </head>
+ <body>
+  
+  <div class="container">
+      <div class="starter-template">
+
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/admin/">Votação - Admin</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/admin/liberacao/">Reuniões do Dia</a></li>
+                        <li><a href="/autentica/sair/">Sair</a></li>
+                    </ul>
+                </div>
+                </div>
+            </nav>            
+
+            <div class="bs-callout bs-callout-primary">
+                <h4>{% block title %}Seja bem vindo, {{ user.first_name }}{% endblock %}</h4>
+            </div>
+
+            {% for message in messages %}
+                {% if 'success' in message.tags %}
+                    <div class="alert alert-success">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endif %}
+                {% if 'error' in message.tags %}
+                    <div class="alert alert-danger">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+        {% block content %}{% endblock content %}
+      </div>
+    </div>
+    {% javascript 'master' %}
+
+    <script>
+        $(document).ready( function() {
+            $('.dropdown-toggle').dropdown();
+        });
+    </script>
+
+    {% block extra_javascript %}
+
+    {% endblock %}
+ </body>
+ </html>
