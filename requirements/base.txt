@@ -60,4 +60,6 @@ pyenchant>=2.0.0
 
 setuptools
 
-requests==2.19.1
+requests
+
+django-settings-export
