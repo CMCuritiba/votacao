@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = [
      'ldapdb',
      'autentica',
      'tinymce',
+     'corsheaders',
 ]
 
 # Apps specific for this project go here.
@@ -62,11 +63,15 @@ LOCAL_APPS = [
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+
+CORS_ORIGIN_ALLOW_ALL=True
+
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
