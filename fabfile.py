@@ -229,7 +229,6 @@ def cria_links():
 	if env.environment == 'staging' or env.environment == 'production':
 		sudo('ln -sf {}/deploy/{}/supervisor.conf /etc/supervisor/conf.d/votacao.conf'.format(PROJECT_ROOT,env.environment))
 		sudo('ln -sf {}/deploy/{}/nginx.conf /etc/nginx/sites-enabled/votacao'.format(PROJECT_ROOT,env.environment))
-		sudo('chmod a+x {}/deploy/{}/bootstrap.sh'.format(PROJECT_ROOT,env.environment))
 		sudo('chmod a+x {}/deploy/{}/run.sh'.format(PROJECT_ROOT,env.environment))
 	else:
 		print('Nenhum ambiente selecionado. Defina staging ou production.')
