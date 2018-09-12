@@ -12,7 +12,7 @@ ENVS = '/usr/share/envs'
 PROJECT_ROOT = WEBAPPS + '/%s' % PROJECT_NAME
 REPO = 'https://github.com/CMCuritiba/votacao'
 USERAPP = 'www-data'
-ENV_NAME = 'cotacao'
+ENV_NAME = 'votacao'
 
 env.hosts = []
 

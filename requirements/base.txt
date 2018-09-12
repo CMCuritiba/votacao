@@ -59,3 +59,5 @@ django-bootstrap3-datetimepicker-2>=2.6.0
 pyenchant>=2.0.0
 
 setuptools
+
+requests==2.19.1
