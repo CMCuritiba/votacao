@@ -7,7 +7,9 @@
 
 
 <div class="panel panel-primary">
-    <div id="projeto" class="panel-heading"></div>
+    <input type="hidden" name="votacao" id="votacao"/>
+    <input type="hidden" name="tipo_voto" id="tipo_voto"/>
+    <div id="projeto" class="panel-heading">Tela de votação de projetos</div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-12">
@@ -19,11 +21,35 @@
                     <h3 id="ementa"></h3>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3 id="conclusao"></h3>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="jumbotron text-center" id="botoes">
+    <h1>Aguardando liberação para votação</h1>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="votoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+      </div>
+      <div class="modal-body">
+        <h2><b>Por favor, confirme o seu voto <span id="desc_tipo_voto"></span></b></h2>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao">Confirma</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}    
@@ -37,7 +63,31 @@
 
             var tim = setInterval(function() {
                 atualiza_votacao();                
-            }, 500);
+            }, 10000);
+
+            $("button#confirmaVotacao").click(function() {
+                tipo_voto = $('#tipo_voto').val();
+                request_url = "/api/vota/" + tipo_voto + "/";
+                votacao = $('#votacao').val();
+
+                $.ajax({
+                    url: request_url,
+                    type: 'POST',
+                    data: { csrfmiddlewaretoken: '{{csrf_token}}', votacao: votacao },
+                    accepts: 'application/json',
+                    dataType: 'json',
+                    success: function(result){
+                        montaBotoes(true);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(status);
+                        console.log(error);
+                        console.log(xhr);
+                    }
+                })
+
+                $("#votoModal").modal('hide');
+            })
         });
 
         function atualiza_votacao() {
@@ -52,7 +102,7 @@
                     if (result.length > 0) {
                         limpaCampos();
                         carregaCampos(result);
-                        montaBotoes();
+                        montaBotoes(result[0].votado);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -65,23 +115,71 @@
             $('#projeto').empty();
             $('#iniciativa').empty();
             $('#ementa').empty();
+            $('#conclusao').empty();
         }
 
         function carregaCampos(result) {
+            $('#votacao').val(result[0].id);
             $('#projeto').append('<h1>' + result[0].codigo_proposicao + '</h1>');
             $('#iniciativa').append('Iniciativa: ' + result[0].iniciativa);
             $('#ementa').append(result[0].sumula);
+            $('#conclusao').append('Conclusão: ' + result[0].conclusao_relator);
         }
 
-        function montaBotoes() {
+        function montaBotoes(status_voto) {
             $('#botoes').empty();
-            $('#botoes').append('<button type="button" class="btn btn-success btn-lg botao"> FAVORÁVEL </button>');
-            $('#botoes').append('<button type="button" class="btn btn-warning btn-lg botao"> FAVORÁVEL COM RESTRIÇÕES </button>');
-            $('#botoes').append('<button type="button" class="btn btn-danger btn-lg botao"> CONTRÁRIO </button>');
-            $('#botoes').append('<br/>');
-            $('#botoes').append('<br/>');
-            $('#botoes').append('<button type="button" class="btn btn-primary btn-lg botao"> ABSTENÇÃO </button>');
-            $('#botoes').append('<button type="button" class="btn btn-info btn-lg botao"> VISTA </button>');
+            if (!status_voto) {
+                $('#botoes').append('<button type="button" class="btn btn-success btn-lg botao" onclick="javascript:votaFavoravel();"> FAVORÁVEL </button>');
+                $('#botoes').append('<button type="button" class="btn btn-warning btn-lg botao" onclick="javascript:votaFavoravelRestricoes();"> FAVORÁVEL COM RESTRIÇÕES </button>');
+                $('#botoes').append('<button type="button" class="btn btn-danger btn-lg botao" onclick="javascript:votaContrario();"> CONTRÁRIO </button>');
+                $('#botoes').append('<br/>');
+                $('#botoes').append('<br/>');
+                $('#botoes').append('<button type="button" class="btn btn-primary btn-lg botao" onclick="javascript:votaAbstencao();"> ABSTENÇÃO </button>');
+                $('#botoes').append('<button type="button" class="btn btn-info btn-lg botao" onclick="javascript:votaVista();"> VISTA </button>');
+            }
+            else {
+                $('#botoes').append('<h1>Voto realizado com sucesso.</h1>');
+            }
+        }
+
+        function votaFavoravel() {
+            $('#tipo_voto').val("F");
+            modal = $('#votoModal').modal();
+            modal.find('#desc_tipo_voto').removeClass();
+            modal.find('#desc_tipo_voto').addClass("text-success");
+            modal.find('#desc_tipo_voto').html("FAVORÁVEL");
+        }
+
+        function votaFavoravelRestricoes() {
+            $('#tipo_voto').val("R");
+            modal = $('#votoModal').modal();
+            modal.find('#desc_tipo_voto').removeClass();
+            modal.find('#desc_tipo_voto').addClass("text-warning");
+            modal.find('#desc_tipo_voto').html("FAVORÁVEL COM RESTRIÇÕES");
+        }
+
+        function votaContrario() {
+            $('#tipo_voto').val("C");
+            modal = $('#votoModal').modal();
+            modal.find('#desc_tipo_voto').removeClass();
+            modal.find('#desc_tipo_voto').addClass("text-danger");
+            modal.find('#desc_tipo_voto').html("CONTRÁRIO");
+        }
+
+        function votaAbstencao() {
+            $('#tipo_voto').val("A");
+            modal = $('#votoModal').modal();
+            modal.find('#desc_tipo_voto').removeClass();
+            modal.find('#desc_tipo_voto').addClass("text-primary");
+            modal.find('#desc_tipo_voto').html("ABSTENÇÃO");
+        }
+
+        function votaVista() {
+            $('#tipo_voto').val("V");
+            modal = $('#votoModal').modal();
+            modal.find('#desc_tipo_voto').removeClass();
+            modal.find('#desc_tipo_voto').addClass("text-info");
+            modal.find('#desc_tipo_voto').html("VISTA");
         }
 
     </script>

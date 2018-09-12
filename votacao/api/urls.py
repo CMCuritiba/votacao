@@ -14,6 +14,7 @@ urlpatterns = [
 	path('verifica_abertos/', views.verifica_abertos, name='verifica-abertos'),
 	path('retorna_aberto/', views.retorna_aberto, name='retorna_aberto'),
 	path('consome_projetos/<int:pac_id>/', views.consome_projetos, name='consome-projetos'),
+	path('vota/<tipo_voto>/', views.vota, name='vota'),
 ]	
 
 #urlpatterns += router.urls

@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from votacao.votacao.forms import JSONVotacaoForm
-from votacao.votacao.models import Votacao
+from votacao.votacao.models import Votacao, Voto
 
 import json
 import requests
@@ -109,9 +109,17 @@ def retorna_aberto(request):
 		projeto = None
 	if projeto:
 		search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(settings.MSCMC_SERVER, projeto.pac_id, projeto.par_id)
+		id_projeto = projeto.id
+		try:
+			voto = Voto.objects.get(votacao=projeto, vereador=request.user)
+			votado = True
+		except Voto.DoesNotExist:
+			votado = False
 		r = requests.get(search_url)
+
 		projeto = r.json()
 		try :
+			ejson['id'] = id_projeto
 			ejson['pac_id'] = projeto[0]['pac_id']
 			ejson['par_id'] = projeto[0]['par_id']
 			ejson['iniciativa'] = projeto[0]['iniciativa']
@@ -121,9 +129,27 @@ def retorna_aberto(request):
 			ejson['tem_emendas'] = projeto[0]['tem_emendas']
 			ejson['sumula'] = projeto[0]['sumula']
 			ejson['codigo_proposicao'] = projeto[0]['codigo_proposicao']
+			ejson['votado'] = votado
 			result_json.append(ejson)
 		except:
 			pass
-		
-	print(result_json)
 	return JsonResponse(result_json, safe=False)
+
+# -----------------------------------------------------------------------------------
+# chamada API para votar um projeto
+# -----------------------------------------------------------------------------------
+def vota(request, tipo_voto):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		votacao = request.POST['votacao']
+		if (votacao != None):
+			try:
+				votacao = Votacao.objects.get(id=votacao)
+				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+			except Votacao.DoesNotExist:
+				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+				return response
+			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso'}, status=200)
+	return response	
