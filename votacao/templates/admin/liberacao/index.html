@@ -255,6 +255,9 @@
 
             $.ajax({
                 url: request_url,
+                xhrFields: {
+                    withCredentials: true
+                },
                 type: 'POST',
                 data: {csrfmiddlewaretoken: '{{csrf_token}}'},
                 accepts: 'application/json',
@@ -276,6 +279,9 @@
 
             $.ajax({
                 url: request_url,
+                xhrFields: {
+                    withCredentials: true
+                },
                 type: 'POST',
                 data: {csrfmiddlewaretoken: '{{csrf_token}}'},
                 accepts: 'application/json',
