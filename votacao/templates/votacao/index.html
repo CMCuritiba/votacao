@@ -52,6 +52,25 @@
   </div>
 </div>
 
+<!-- Modal Restrições-->
+<div class="modal fade" id="votoModalRestricoes" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+      </div>
+      <div class="modal-body">
+        <h2><b>Por favor, confirme o seu voto <span id="desc_tipo_voto"></span></b></h2>
+        <textarea class="form-control col-xs-12" rows="10"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao">Confirma</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}    
 
 
@@ -60,6 +79,8 @@
     <script>
 
         $(document).ready(function() {
+
+            atualiza_votacao();
 
             var tim = setInterval(function() {
                 atualiza_votacao();                
@@ -152,7 +173,7 @@
 
         function votaFavoravelRestricoes() {
             $('#tipo_voto').val("R");
-            modal = $('#votoModal').modal();
+            modal = $('#votoModalRestricoes').modal();
             modal.find('#desc_tipo_voto').removeClass();
             modal.find('#desc_tipo_voto').addClass("text-warning");
             modal.find('#desc_tipo_voto').html("FAVORÁVEL COM RESTRIÇÕES");

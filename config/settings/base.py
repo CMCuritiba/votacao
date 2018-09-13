@@ -52,7 +52,7 @@ THIRD_PARTY_APPS = [
      'django_python3_ldap',
      'ldapdb',
      'autentica',
-     'tinymce',
+#     'tinymce',
 #     'corsheaders',
 ]
 
@@ -414,7 +414,7 @@ LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
 LDAP_AUTH_CONNECTION_USERNAME = None
 LDAP_AUTH_CONNECTION_PASSWORD = None
 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+#X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 TINYMCE_SPELLCHECKER = True
 TINYMCE_COMPRESSOR = True
