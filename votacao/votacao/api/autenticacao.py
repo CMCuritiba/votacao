@@ -23,7 +23,7 @@ class CMCVereadorLoginRequired(CMCLoginRequired):
 
 		if (request.user.pessoa != None):
 			search_url = '{}/api/funcionario/{}/'.format(settings.MSCMC_SERVER, request.user.pessoa)
-			r = requests.get(search_url, , verify=False)
+			r = requests.get(search_url, verify=False)
 			pessoa = r.json()
 			try:
 				# ind_estagiario == 0 (Vereador)
