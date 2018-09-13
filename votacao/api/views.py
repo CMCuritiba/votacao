@@ -54,7 +54,7 @@ def consome_projetos(request, pac_id):
 	array_json=[]
 	if (pac_id != None):
 		search_url = '{}/api/spl/projetos_reuniao/{}/'.format(settings.MSCMC_SERVER, pac_id)
-		r = requests.get(search_url)
+		r = requests.get(search_url, verify=False)
 		projetos = r.json()
 		for projeto in projetos:
 			array_json.append(formata_projeto(projeto))
@@ -115,7 +115,7 @@ def retorna_aberto(request):
 			votado = True
 		except Voto.DoesNotExist:
 			votado = False
-		r = requests.get(search_url)
+		r = requests.get(search_url, verify=False)
 
 		projeto = r.json()
 		try :
