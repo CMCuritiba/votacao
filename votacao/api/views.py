@@ -16,6 +16,9 @@ import json
 import requests
 
 import urllib.request
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # -----------------------------------------------------------------------------------
 # chamada API para abrir um projeto para votação
@@ -24,6 +27,7 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 	response = JsonResponse({'status':'false','message':'Erro ao tentar abrir projeto para votação'}, status=404)
 
 	if request.method == 'POST':
+
 		widget_json = {}
 		if (par_id != None):
 			try:
@@ -153,3 +157,16 @@ def vota(request, tipo_voto):
 				return response
 			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso'}, status=200)
 	return response	
+
+# -----------------------------------------------------------------------------------
+# chamada API reunioes comissao
+# -----------------------------------------------------------------------------------
+def consome_reuniao_comissao(request):
+	search_url = '{}/api/spl/reuniao_comissao/'.format(settings.MSCMC_SERVER)
+
+	array_json=[]
+	r = requests.get(search_url, verify=False)
+	reunioes = r.json()
+
+	return JsonResponse(reunioes, safe=False)		
+

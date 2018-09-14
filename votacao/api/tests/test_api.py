@@ -14,12 +14,12 @@ class JSONVotacaoTest(TestCase):
 
 	def test_url_com_dados(self):
 		VotacaoFactory.create()
-		response = self.client.post('/api/abre_votacao/', {'par_id': 26393, 'pac_id': 667, 'codigo_proposicao':'023.00002.2018', 'aberta': True})
+		response = self.client.post('/api/abre_votacao/667/26393/023.00002.2018/')
 		self.assertEqual(response.status_code, 200)		
 
 	def test_url_sem_dados(self):
 		votacao = VotacaoFactory.create()
-		response = self.client.post('/api/abre_votacao/', {'par_id': 26394, 'pac_id': 667, 'codigo_proposicao':'023.00003.2018', 'aberta': False})
+		response = self.client.post('/api/abre_votacao/667/26394/023.00002.2018/')
 		self.assertEqual(response.status_code, 200)				
 
 
@@ -37,7 +37,7 @@ class JSONVerificaAbertoTest(TestCase):
 
 	def test_url_aberta(self):
 		votacao = VotacaoFactory.create()
-		votacao.aberta = True
+		votacao.status = 'A'
 		votacao.save()
 		response = self.client.post('/api/verifica_abertos/')
 		self.assertEqual(response.status_code, 404)						

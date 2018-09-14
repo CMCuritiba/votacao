@@ -61,3 +61,20 @@ class Voto(models.Model):
 
 	def __str__(self):
 		return self.votacao.codigo_proposicao
+
+#---------------------------------------------------------------------------------------------
+# Model Restricao
+#---------------------------------------------------------------------------------------------
+@python_2_unicode_compatible
+class Restricao(models.Model):
+	class Meta:
+		verbose_name_plural = 'Restrições'
+
+	voto = models.ForeignKey(Voto, on_delete=models.PROTECT)
+	restricao = models.CharField(max_length=500)
+
+	def __unicode__(self):
+		return self.restricao
+
+	def __str__(self):
+		return self.restricao
