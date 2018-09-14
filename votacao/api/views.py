@@ -10,12 +10,11 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from votacao.votacao.forms import JSONVotacaoForm
-from votacao.votacao.models import Votacao, Voto
+from votacao.votacao.models import Votacao, Voto, Restricao
 
 import json
 import requests
 
-import urllib.request
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -152,6 +151,26 @@ def vota(request, tipo_voto):
 			try:
 				votacao = Votacao.objects.get(id=votacao)
 				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+			except Votacao.DoesNotExist:
+				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+				return response
+			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso'}, status=200)
+	return response	
+
+# -----------------------------------------------------------------------------------
+# chamada API para votar um projeto
+# -----------------------------------------------------------------------------------
+def vota_restricao(request, tipo_voto, restricao):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		votacao = request.POST['votacao']
+		if (votacao != None):
+			try:
+				votacao = Votacao.objects.get(id=votacao)
+				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+				restricao = Restricao.objects.create(voto=voto, restricao=restricao)
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 				return response
