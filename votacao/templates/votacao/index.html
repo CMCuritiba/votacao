@@ -88,14 +88,16 @@
 
             $("button#confirmaVotacao").click(function() {
                 tipo_voto = $('#tipo_voto').val();
-                restricao = $('#restricao').val();
-                request_url = "/api/vota/" + tipo_voto + "/";
                 votacao = $('#votacao').val();
 
-                console.log(tipo_voto);
-                console.log(restricao);
+                if (tipo_voto == 'R') {
+                    restricao = $('#restricao').val();
+                    request_url = "/api/vota_restricao/" + tipo_voto + "/" + restricao + "/";
+                }
+                else {
+                    request_url = "/api/vota/" + tipo_voto + "/";
+                }
 
-                /*
                 $.ajax({
                     url: request_url,
                     type: 'POST',
@@ -111,9 +113,9 @@
                         console.log(xhr);
                     }
                 })
-                */
 
                 $("#votoModal").modal('hide');
+                $("#votoModalRestricoes").modal('hide');
             })
         });
 
