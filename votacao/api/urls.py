@@ -15,6 +15,7 @@ urlpatterns = [
 	path('retorna_aberto/', views.retorna_aberto, name='retorna_aberto'),
 	path('consome_projetos/<int:pac_id>/', views.consome_projetos, name='consome-projetos'),
 	path('vota/<tipo_voto>/', views.vota, name='vota'),
+	path('consome_reuniao_comissao/', views.consome_reuniao_comissao, name='consome-reuniao-comissao'),
 ]	
 
 #urlpatterns += router.urls

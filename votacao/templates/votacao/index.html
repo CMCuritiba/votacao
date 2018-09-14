@@ -61,7 +61,7 @@
       </div>
       <div class="modal-body">
         <h2><b>Por favor, confirme o seu voto <span id="desc_tipo_voto"></span></b></h2>
-        <textarea class="form-control col-xs-12" rows="10"></textarea>
+        <textarea class="form-control col-xs-12" rows="10" id="restricao"></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancelar</button>
@@ -88,9 +88,14 @@
 
             $("button#confirmaVotacao").click(function() {
                 tipo_voto = $('#tipo_voto').val();
+                restricao = $('#restricao').val();
                 request_url = "/api/vota/" + tipo_voto + "/";
                 votacao = $('#votacao').val();
 
+                console.log(tipo_voto);
+                console.log(restricao);
+
+                /*
                 $.ajax({
                     url: request_url,
                     type: 'POST',
@@ -106,6 +111,7 @@
                         console.log(xhr);
                     }
                 })
+                */
 
                 $("#votoModal").modal('hide');
             })
