@@ -45,6 +45,9 @@
                 rowReorder: {
                     selector: 'td:nth-child(2)'
                 },
+                select: {
+                    style: 'single'
+                },
                 responsive: true,
                 "order": [[ 1, "asc" ]],
                 "columns": [
@@ -227,10 +230,11 @@
                 $(this).removeClass('selected');
             }
             else {
-                $(this).addClass('selected');
+                tableReunioes.$('tr.selected').removeClass('selected');
                 data = tableReunioes.row(this).data();
                 titulo = data['rec_numero'] + " " + data['con_desc'];
                 carregaProjetos(data['pac_id'], titulo);
+                $(this).addClass('selected');
             }
         });
 

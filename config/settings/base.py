@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
      'django_python3_ldap',
      'ldapdb',
      'autentica',
+     'consumer',
 #     'tinymce',
 #     'corsheaders',
 ]
