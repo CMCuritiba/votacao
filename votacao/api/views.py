@@ -19,6 +19,9 @@ import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+from consumer.lib.views import SPLReuniaoComissaoView
+
+
 # -----------------------------------------------------------------------------------
 # chamada API para abrir um projeto para votação
 # -----------------------------------------------------------------------------------
@@ -158,7 +161,7 @@ def vota(request, tipo_voto):
 	return response	
 
 # -----------------------------------------------------------------------------------
-# chamada API para votar um projeto
+# chamada API para votar um projeto com restrição
 # -----------------------------------------------------------------------------------
 def vota_restricao(request, tipo_voto, restricao):
 	response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
@@ -180,12 +183,5 @@ def vota_restricao(request, tipo_voto, restricao):
 # -----------------------------------------------------------------------------------
 # chamada API reunioes comissao
 # -----------------------------------------------------------------------------------
-def consome_reuniao_comissao(request):
-	search_url = '{}/api/spl/reuniao_comissao/'.format(settings.MSCMC_SERVER)
-
-	array_json=[]
-	r = requests.get(search_url, verify=False)
-	reunioes = r.json()
-
-	return JsonResponse(reunioes, safe=False)		
-
+class ConsomeReuniaoComissao(SPLReuniaoComissaoView):
+	pass

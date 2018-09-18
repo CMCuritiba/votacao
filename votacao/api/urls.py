@@ -4,6 +4,7 @@ from django.urls import include, path
 from django.conf.urls import url
 from rest_framework import routers
 from . import views
+from consumer.lib.views import SPLReuniaoComissaoView
 
 #router = routers.DefaultRouter()
 #router.register(r'get_fake_calendario', views.FakeCalendarioViewSet, base_name='get_fake_calendario')
@@ -16,7 +17,8 @@ urlpatterns = [
 	path('consome_projetos/<int:pac_id>/', views.consome_projetos, name='consome-projetos'),
 	path('vota/<tipo_voto>/', views.vota, name='vota'),
 	path('vota_restricao/<tipo_voto>/<restricao>/', views.vota_restricao, name='vota-restricao'),
-	path('consome_reuniao_comissao/', views.consome_reuniao_comissao, name='consome-reuniao-comissao'),
+	#path('consome_reuniao_comissao/', views.consome_reuniao_comissao, name='consome-reuniao-comissao'),
+	path('consome_reuniao_comissao/', views.ConsomeReuniaoComissao.as_view(), name='consome-reuniao-comissao'),
 ]	
 
 #urlpatterns += router.urls
