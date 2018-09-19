@@ -128,10 +128,16 @@
                 accepts: 'application/json',
                 dataType: 'json',
                 success: function(result){
+                    console.log(result);
                     if (result.length > 0) {
                         limpaCampos();
                         carregaCampos(result);
                         montaBotoes(result[0].votado, result[0].tipo_voto);
+                    }
+                    else {
+                        limpaCampos();
+                        $('#botoes').empty();
+                        $('#botoes').append('<h1>Aguardando liberação para votação</h1>');
                     }
                 },
                 error: function(xhr, status, error) {
