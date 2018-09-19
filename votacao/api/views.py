@@ -119,8 +119,10 @@ def retorna_aberto(request):
 		try:
 			voto = Voto.objects.get(votacao=projeto, vereador=request.user)
 			votado = True
+			tipo_voto = voto.voto
 		except Voto.DoesNotExist:
 			votado = False
+			tipo_voto = None
 		r = requests.get(search_url, verify=False)
 
 		projeto = r.json()
@@ -136,6 +138,7 @@ def retorna_aberto(request):
 			ejson['sumula'] = projeto[0]['sumula']
 			ejson['codigo_proposicao'] = projeto[0]['codigo_proposicao']
 			ejson['votado'] = votado
+			ejson['tipo_voto'] = tipo_voto
 			result_json.append(ejson)
 		except:
 			pass
@@ -157,7 +160,7 @@ def vota(request, tipo_voto):
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 				return response
-			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso'}, status=200)
+			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
 	return response	
 
 # -----------------------------------------------------------------------------------
@@ -177,7 +180,7 @@ def vota_restricao(request, tipo_voto, restricao):
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 				return response
-			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso'}, status=200)
+			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': restricao}, status=200)
 	return response	
 
 # -----------------------------------------------------------------------------------

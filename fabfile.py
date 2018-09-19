@@ -275,6 +275,18 @@ def update_autenticacao():
 	chown()		
 
 @task
+def update_consumer():
+	des_chown()
+	with cd(PROJECT_ROOT):
+		with source_virtualenv():
+			# Roda o bower install
+			sudo('pip install https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-consumer-0.2.tar.gz?raw=true --upgrade --no-cache-dir')
+			#run('python manage.py makemigrations votacao --settings=config.settings.production')
+			#run('./manage.py makemigrations autentica --settings=config.settings.production')
+			#run('./manage.py makemigrations cadastro --settings=config.settings.production')
+	chown()			
+
+@task
 def temp():
 	des_chown()
 	#sudo('pip install https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.1.tar.gz --upgrade')

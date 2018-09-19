@@ -151,6 +151,10 @@
                         title: "Iniciativa",
                         data: 'iniciativa',
                     },
+                    { 
+                        title: "Relator" ,
+                        data: 'relator',
+                    },
                     
                 ],
                 "columnDefs": [
@@ -176,6 +180,11 @@
                     },
                     {
                         "targets": [4],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [5],
                         "data": null,
                         "render" : function(data, type, full, meta) {
                             if (full.status == 'A') {

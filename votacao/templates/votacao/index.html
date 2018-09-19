@@ -105,7 +105,7 @@
                     accepts: 'application/json',
                     dataType: 'json',
                     success: function(result){
-                        montaBotoes(true);
+                        montaBotoes(true, result.tipo_voto);
                     },
                     error: function(xhr, status, error) {
                         console.log(status);
@@ -131,7 +131,7 @@
                     if (result.length > 0) {
                         limpaCampos();
                         carregaCampos(result);
-                        montaBotoes(result[0].votado);
+                        montaBotoes(result[0].votado, result[0].tipo_voto);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -155,7 +155,7 @@
             $('#conclusao').append('Conclusão: ' + result[0].conclusao_relator);
         }
 
-        function montaBotoes(status_voto) {
+        function montaBotoes(status_voto, tipo_voto) {
             $('#botoes').empty();
             if (!status_voto) {
                 $('#botoes').append('<button type="button" class="btn btn-success btn-lg botao" onclick="javascript:votaFavoravel();"> FAVORÁVEL </button>');
@@ -167,7 +167,8 @@
                 $('#botoes').append('<button type="button" class="btn btn-info btn-lg botao" onclick="javascript:votaVista();"> VISTA </button>');
             }
             else {
-                $('#botoes').append('<h1>Voto realizado com sucesso.</h1>');
+                $('#botoes').append('<h1>Voto realizado com sucesso.</h1><br/>');
+                $('#botoes').append('<h2>Vereador {{ user.get_full_name }} votou: </h2>' + resultadoVoto(tipo_voto));
             }
         }
 
@@ -209,6 +210,21 @@
             modal.find('#desc_tipo_voto').removeClass();
             modal.find('#desc_tipo_voto').addClass("text-info");
             modal.find('#desc_tipo_voto').html("VISTA");
+        }
+
+        function resultadoVoto(tipo_voto) {
+            if (tipo_voto == 'F')
+                return '<h2 class="text-success">FAVORÁVEL</h2>';
+            else if (tipo_voto == 'R')
+                return '<h2 class="text-warning">FAVORÁVEL COM RESTRIÇÕES</h2>';
+            else if (tipo_voto == 'C')
+                return '<h2 class="text-danger">CONTRÁRIO</h2>';
+            else if (tipo_voto == 'A')
+                return '<h2 class="text-primary">ABSTENÇÃO</h2>';
+            else if (tipo_voto == 'V')
+                return '<h2 class="text-info">VISTA</h2>';
+            else
+                return '<h2 class="text-danger">ERRO</h2>'
         }
 
     </script>
