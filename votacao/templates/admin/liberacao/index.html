@@ -34,7 +34,7 @@
     <script>
         var tableReunioes;
         var tableProjetos;
-        var algumaAberta = false;
+        var algumaAberta = verifica_aberto();
 
         $(document).ready(function() {
 
@@ -188,7 +188,6 @@
                         "data": null,
                         "render" : function(data, type, full, meta) {
                             if (full.status == 'A') {
-                                algumaAberta = true;
                                 return "<a href='javascript:fechaVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-danger'>Fechar Votação</span></a>";
                             }
                             else if (full.status == 'F' && !algumaAberta) {
@@ -239,11 +238,17 @@
                 $(this).removeClass('selected');
             }
             else {
-                tableReunioes.$('tr.selected').removeClass('selected');
-                data = tableReunioes.row(this).data();
-                titulo = data['rec_numero'] + " " + data['con_desc'];
-                carregaProjetos(data['pac_id'], titulo);
-                $(this).addClass('selected');
+                if (tableReunioes.data().any()) {
+                    tableReunioes.$('tr.selected').removeClass('selected');
+                    data = tableReunioes.row(this).data();
+                    titulo = data['rec_numero'] + " " + data['con_desc'];
+                    carregaProjetos(data['pac_id'], titulo);
+                    $(this).addClass('selected');
+                } 
+                else {
+                    tableReunioes.clear();
+                    carregaProjetos(0, 0);
+                }
             }
         });
 
@@ -306,6 +311,30 @@
                     console.log(status);
                     console.log(error);
                     console.log(xhr);
+                }
+            })
+        }
+
+        function verifica_aberto() {
+            request_url = "/api/verifica_abertos/";
+
+            $.ajax({
+                url: request_url,
+                type: 'GET',
+                accepts: 'application/json',
+                dataType: 'json',
+                success: function(result){
+                    console.log(result.status);
+                    if (result.length > 0) {
+                        if (result.status)
+                            return false;
+                        else
+                            return true;
+                    }
+                    return true;
+                },
+                error: function(xhr, status, error) {
+                    console.log('Problema ao carregar informações do projeto.');
                 }
             })
         }

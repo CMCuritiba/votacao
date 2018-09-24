@@ -45,7 +45,7 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 # chamada API para verificar se existe algum projeto aberto
 # -----------------------------------------------------------------------------------
 def verifica_abertos(request):
-	response = JsonResponse({'status':'false','message':'Já existe projeto para votação aberto'}, status=404)
+	response = JsonResponse({'status':'false','message':'Já existe projeto para votação aberto'}, status=200)
 
 	abertas = Votacao.objects.filter(status='A')
 	if abertas.count() <= 0:
@@ -188,3 +188,4 @@ def vota_restricao(request, tipo_voto, restricao):
 # -----------------------------------------------------------------------------------
 class ConsomeReuniaoComissao(SPLReuniaoComissaoView):
 	pass
+
