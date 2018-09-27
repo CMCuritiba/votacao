@@ -337,8 +337,8 @@ PIPELINE = {
         'master': {
             'source_filenames': (
               'jquery/jquery.js',
-              #'moment/min/moment.min.js',
-              #'moment/locale/pt-br.js',
+              'moment/min/moment.min.js',
+              'moment/locale/pt-br.js',
               'bootstrap/dist/js/bootstrap.min.js',
               'underscore/underscore-min.js',
               #'bootstrap-calendar/js/language/pt-BR.js',
@@ -384,7 +384,7 @@ BOWER_INSTALLED_APPS = (
     #'vue',
     #'vue-strap',
     'fontawesome',
-    #'moment',
+    'moment',
     #'fullcalendar',
     #'bootstrap-select'
 )

@@ -32,3 +32,9 @@ class LiberacaoIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
 #--------------------------------------------------------------------------------------    
 class VotacaoIndex(CMCVereadorLoginRequired, SuccessMessageMixin, TemplateView):
     template_name = 'votacao/index.html'            
+
+#--------------------------------------------------------------------------------------
+# Relatorio Votacao Index
+#--------------------------------------------------------------------------------------    
+class RelatorioVotacaoIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
+    template_name = 'admin/relatorio/votacao/index.html'                

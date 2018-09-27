@@ -284,7 +284,7 @@ def update_consumer():
 			#run('python manage.py makemigrations votacao --settings=config.settings.production')
 			#run('./manage.py makemigrations autentica --settings=config.settings.production')
 			#run('./manage.py makemigrations cadastro --settings=config.settings.production')
-	chown()			
+	chown()
 
 @task
 def temp():
