@@ -63,3 +63,5 @@ setuptools
 requests
 
 django-settings-export
+
+psycopg2-binary
