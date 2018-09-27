@@ -40,4 +40,5 @@ class JSONVerificaAbertoTest(TestCase):
 		votacao.status = 'A'
 		votacao.save()
 		response = self.client.post('/api/verifica_abertos/')
-		self.assertEqual(response.status_code, 404)						
+		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.json()['status'], 'false')
