@@ -337,8 +337,8 @@ PIPELINE = {
         'master': {
             'source_filenames': (
               'jquery/jquery.js',
-              #'moment/min/moment.min.js',
-              #'moment/locale/pt-br.js',
+              'moment/min/moment.min.js',
+              'moment/locale/pt-br.js',
               'bootstrap/dist/js/bootstrap.min.js',
               'underscore/underscore-min.js',
               #'bootstrap-calendar/js/language/pt-BR.js',
@@ -350,6 +350,7 @@ PIPELINE = {
               'datatables/media/js/dataTables.bootstrap.js',
               'datatables.net-responsive/js/dataTables.responsive.min.js',
               'datatables.net-responsive-bs/js/responsive.bootstrap.min.js',
+              'datatables-datetime-moment/dist/js/datetime-moment.min.js',
               #'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
               #'fullcalendar/dist/fullcalendar.min.js',
               #'fullcalendar/dist/gcal.min.js',
@@ -379,12 +380,13 @@ BOWER_INSTALLED_APPS = (
     'bootstrap-3-datepicker',
     'bootstrap-datepicker',
     'datatables.net-responsive-bs',
+    'datatables-datetime-moment',
     #'eonasdan-bootstrap-datetimepicker#latest',
     #'bootstrap3-datetimepicker',
     #'vue',
     #'vue-strap',
     'fontawesome',
-    #'moment',
+    'moment',
     #'fullcalendar',
     #'bootstrap-select'
 )

@@ -19,6 +19,7 @@ urlpatterns = [
 	path('vota_restricao/<tipo_voto>/<restricao>/', views.vota_restricao, name='vota-restricao'),
 	#path('consome_reuniao_comissao/', views.consome_reuniao_comissao, name='consome-reuniao-comissao'),
 	path('consome_reuniao_comissao/', views.ConsomeReuniaoComissao.as_view(), name='consome-reuniao-comissao'),
+	path('consome_reuniao_comissao_range/<data_inicio>/<data_fim>/', views.consome_reunioes_range, name='consome-reuniao-comissao-range'),
 ]	
 
 #urlpatterns += router.urls

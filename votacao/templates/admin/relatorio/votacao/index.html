@@ -1,0 +1,205 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Relatório de Votação{% endblock %}
+
+{% block content %}
+
+
+
+    <div class="panel panel-info">
+        <div class="panel-heading">Opções de Filtro</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class='input-group date' id='datepicker1'>
+                            <input type='text' class="form-control altera" placeholder="Data Início" data-live-search="true" data-width="50%" id="id_filtro_data_inicio" name="id_filtro_data_inicio"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar dateinput"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class='input-group date' id='datepicker2'>
+                            <input type='text' class="form-control" placeholder="Data Fim" data-live-search="true" data-width="50%" id="id_filtro_data_fim" name="id_filtro_data_fim"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar dateinput"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>           
+    </div>           
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">Reuniões</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <table id="treunioes" class="table table-striped table-hover table-bordered fonteTable" width="100%" cellspacing="0"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+
+    <script>
+
+        var tableReunioes;
+
+        $(document).ready(function() {
+
+            $('#datepicker1').datepicker({
+                format: "dd/mm/yyyy",
+                language: "pt-BR",
+                todayHighlight: true,
+                clearBtn: false,
+                autoclose: true,
+                orientation: "bottom left",
+            });
+
+            $('#datepicker2').datepicker({
+                format: "dd/mm/yyyy",
+                language: "pt-BR",
+                todayHighlight: true,
+                clearBtn: false,
+                autoclose: true,
+                orientation: "bottom left",
+            });
+
+            $.fn.dataTable.moment( 'DD/MM/YYYY' );
+
+            tableReunioes = $('#treunioes').DataTable({
+
+                rowReorder: {
+                    selector: 'td:nth-child(2)'
+                },
+                select: {
+                    style: 'single'
+                },
+                initComplete: function(settings, json) {
+                    atualizaReunioes();
+                },
+                responsive: true,
+                "order": [[ 3, "desc" ]],
+                "columns": [
+                    { 
+                        title: "pac_id" ,
+                        data: 'pac_id'
+                    },
+                    { 
+                        title: "Número" ,
+                        data: 'rec_numero',
+                    },
+                    { 
+                        title: "Comissão",
+                        data: 'con_desc',
+                    },
+                    { 
+                        title: "Data",
+                        data: 'rec_data',
+                    },
+                    { 
+                        title: "Tipo",
+                        data: 'rec_tipo_reuniao',
+                    },
+                    
+                ],
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [1],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [2],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [3],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [4],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [5],
+                        "data": null,
+                        "render" : function(data, type, full, meta) {
+                            return "<a href='javascript:geraRelatorio(" + full.pac_id + ")'><span id='relatorio' class='badge progress-bar-danger'>Relatório</span></a>";
+                        },
+                        "className": "dt-center"
+                    },
+                            
+
+                ],
+                "language": {
+                    "info": "Páginas _PAGE_ de _PAGES_",
+                    "emptyTable": "Não há reuniões agendadas para a pesquisa",
+                    "decimal": ",",
+                    "thousands": ".",
+                    "oPaginate": {
+                        "sFirst": '<span class="glyphicon glyphicon-fast-backward"></span>',
+                        "sLast": '<span class="glyphicon glyphicon-fast-forward"></span>',
+                        "sNext": '<span class="glyphicon glyphicon-forward"></span>',
+                        "sPrevious": '<span class="glyphicon glyphicon-backward"></span>'
+                    }
+                },
+                "deferRender": true,
+                "bPaginate" : true,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bInfo": false,
+                "ajax": {
+                    "url": "/api/consome_reuniao_comissao",
+                    "dataSrc": "",
+                },
+                "sDom": '<"top"i>rt<"bottom"lp><"clear">',
+            });
+
+        });
+
+
+        $('#id_filtro_data_inicio').change( function() { atualizaReunioes(); } );
+
+        $('#id_filtro_data_fim').change( function() { atualizaReunioes(); } );
+
+        $('.altera').val(moment().format('DD/MM/YYYY'));
+
+        function atualizaReunioes() {
+            inicio = $('#id_filtro_data_inicio').val();
+            fim = $('#id_filtro_data_fim').val();
+            inicio_clean = inicio.split('/').join('')
+            fim_clean = fim.split('/').join('')
+            if (fim_clean == '')
+                fim_clean = '00000000'
+
+            url = "/api/consome_reuniao_comissao_range/" + inicio_clean + "/" + fim_clean + "/";
+            tableReunioes.ajax.url(url).load();
+        }
+
+        function geraRelatorio() {
+            console.log('GERA RELATÓRIO');
+            alert('Relatório será implementado na próxima versão');
+        }
+
+    </script>
+
+{% endblock %}
