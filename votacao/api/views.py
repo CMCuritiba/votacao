@@ -20,6 +20,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from consumer.lib.views import SPLReuniaoComissaoView
+from consumer.lib.msconsumer import MSCMCConsumer
 
 
 # -----------------------------------------------------------------------------------
@@ -189,3 +190,9 @@ def vota_restricao(request, tipo_voto, restricao):
 class ConsomeReuniaoComissao(SPLReuniaoComissaoView):
 	pass
 
+# -----------------------------------------------------------------------------------
+# chamada API para consumir reuniões dentro range datas
+# -----------------------------------------------------------------------------------
+def consome_reunioes_range(request, data_inicio, data_fim):
+	consumer = MSCMCConsumer()
+	return consumer.consome_reuniao_comissao_range(request, data_inicio, data_fim)

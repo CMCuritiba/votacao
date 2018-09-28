@@ -45,15 +45,6 @@
             </div>
         </div>
     </div>
-    <div class="panel panel-primary">
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary" onclick="javascript:geraRelatorio();">Relatório</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 {% endblock %}
 
@@ -84,6 +75,8 @@
                 orientation: "bottom left",
             });
 
+            $.fn.dataTable.moment( 'DD/MM/YYYY' );
+
             tableReunioes = $('#treunioes').DataTable({
 
                 rowReorder: {
@@ -92,8 +85,11 @@
                 select: {
                     style: 'single'
                 },
+                initComplete: function(settings, json) {
+                    atualizaReunioes();
+                },
                 responsive: true,
-                "order": [[ 1, "asc" ]],
+                "order": [[ 3, "desc" ]],
                 "columns": [
                     { 
                         title: "pac_id" ,
@@ -143,12 +139,20 @@
                         "visible": true,
                         "searchable": false
                     },
+                    {
+                        "targets": [5],
+                        "data": null,
+                        "render" : function(data, type, full, meta) {
+                            return "<a href='javascript:geraRelatorio(" + full.pac_id + ")'><span id='relatorio' class='badge progress-bar-danger'>Relatório</span></a>";
+                        },
+                        "className": "dt-center"
+                    },
                             
 
                 ],
                 "language": {
                     "info": "Páginas _PAGE_ de _PAGES_",
-                    "emptyTable": "Não há reuniões agendadas para hoje",
+                    "emptyTable": "Não há reuniões agendadas para a pesquisa",
                     "decimal": ",",
                     "thousands": ".",
                     "oPaginate": {
@@ -170,63 +174,8 @@
                 "sDom": '<"top"i>rt<"bottom"lp><"clear">',
             });
 
-            $.fn.dataTableExt.afnFiltering.push(
-                function( oSettings, aData, iDataIndex ) {
-
-                    var today = new Date();
-                    var dd = today.getDate();
-                    var mm = today.getMonth() + 1;
-                    var yyyy = today.getFullYear();
-                    
-                    if (dd<10)
-                    dd = '0'+dd;
-                    
-                    if (mm<10)
-                    mm = '0'+mm;
-                    
-                    today = dd+'/'+mm+'/'+yyyy;
-                    
-                    if ($('#id_filtro_data_inicio').val() != '' || $('#id_filtro_data_fim').val() != '') {
-
-                    var iMin_temp = $('#id_filtro_data_inicio').val();
-                    if (iMin_temp == '') {
-                      iMin_temp = '01/01/1980';
-                    }
-                    
-                    var iMax_temp = $('#id_filtro_data_fim').val();
-                    if (iMax_temp == '') {
-                      iMax_temp = '01/01/2099';
-                    }
-                    
-                    var arr_min = iMin_temp.split("/");
-                    var arr_max = iMax_temp.split("/");
-                    var arr_date = aData[2].split("/");
-                    var iMin = new Date(arr_min[2], arr_min[1], arr_min[0], 0, 0, 0, 0)
-                    var iMax = new Date(arr_max[2], arr_max[1], arr_max[0], 0, 0, 0, 0)
-                    var iDate = new Date(arr_date[2], arr_date[1], arr_date[0], 0, 0, 0, 0)
-
-                    if ( iMin == "" && iMax == "" )
-                    {
-                        return true;
-                    }
-                    else if ( iMin == "" && iDate < iMax )
-                    {
-                        return true;
-                    }
-                    else if ( iMin <= iDate && "" == iMax )
-                    {
-                        return true;
-                    }
-                    else if ( iMin <= iDate && iDate <= iMax )
-                    {
-                        return true;
-                    }
-                    return false;
-                    }
-                }
-            );
-
         });
+
 
         $('#id_filtro_data_inicio').change( function() { atualizaReunioes(); } );
 
@@ -235,11 +184,22 @@
         $('.altera').val(moment().format('DD/MM/YYYY'));
 
         function atualizaReunioes() {
-            console.log('PESQUISANDO DE: ' + $('#id_filtro_data_inicio').val() + ' Até ' + $('#id_filtro_data_fim').val());
+            inicio = $('#id_filtro_data_inicio').val();
+            fim = $('#id_filtro_data_fim').val();
+            inicio_clean = inicio.split('/').join('')
+            fim_clean = fim.split('/').join('')
+            if (fim_clean == '')
+                fim_clean = '00000000'
+
+            url = "/api/consome_reuniao_comissao_range/" + inicio_clean + "/" + fim_clean + "/";
+            tableReunioes.ajax.url(url).load();
         }
 
-        atualizaReunioes();
-        
+        function geraRelatorio() {
+            console.log('GERA RELATÓRIO');
+            alert('Relatório será implementado na próxima versão');
+        }
+
     </script>
 
 {% endblock %}
