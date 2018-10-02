@@ -11,16 +11,20 @@ from django.conf import settings
 
 from votacao.votacao.forms import JSONVotacaoForm
 from votacao.votacao.models import Votacao, Voto, Restricao
+from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert
 
 import json
 import requests
 
 import urllib3
 
+import jsonref
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from consumer.lib.views import SPLReuniaoComissaoView
 from consumer.lib.msconsumer import MSCMCConsumer
+
 
 
 # -----------------------------------------------------------------------------------
@@ -125,7 +129,6 @@ def retorna_aberto(request):
 			votado = False
 			tipo_voto = None
 		r = requests.get(search_url, verify=False)
-
 		projeto = r.json()
 		try :
 			ejson['id'] = id_projeto
@@ -196,3 +199,63 @@ class ConsomeReuniaoComissao(SPLReuniaoComissaoView):
 def consome_reunioes_range(request, data_inicio, data_fim):
 	consumer = MSCMCConsumer()
 	return consumer.consome_reuniao_comissao_range(request, data_inicio, data_fim)
+
+# -----------------------------------------------------------------------------------
+# chamada API para gerar dados relatório votação formato JSON
+# -----------------------------------------------------------------------------------
+def relatorio_votacao(request, pac_id):
+	consumer = MSCMCConsumer()
+
+
+	rec_id = consumer.consome_rec_id(request, pac_id)
+	reuniao = consumer.consome_reuniao(request, rec_id)
+	con_id = reuniao['con_id']
+	rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
+	print(reuniao)
+	rec_data = reuniao['rec_data']
+	rec_numero = reuniao['rec_numero']
+	comissao = consumer.consome_comissao(request, con_id)
+	ini_nome = comissao['ini_nome']
+	reuniao_js = ReuniaoJSON(rec_id, rec_tipo_reuniao, rec_numero, ini_nome, rec_data)
+
+	votacoes_model = Votacao.objects.filter(status='V', pac_id = pac_id)
+	for votacao in votacoes_model:
+		try:
+			search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(settings.MSCMC_SERVER, votacao.pac_id, votacao.par_id)
+			r = requests.get(search_url, verify=False)
+			projeto = r.json()
+			relator = projeto[0]['relator']
+			iniciativa = projeto[0]['iniciativa']
+		except:
+			relator = None
+			iniciativa = None
+		tot_favoravel = 0
+		tot_favoravel_restricoes = 0
+		tot_contrario = 0
+		tot_abstencao = 0
+		tot_vista = 0
+		if rec_id is not None:
+			votacao_incluir = VotacaoJSON(con_id, votacao.codigo_proposicao, relator, iniciativa)
+
+		if rec_id is not None and con_id is not None:
+			for voto in votacao.lista_votos():
+				if voto.voto == 'F':
+					tot_favoravel += 1
+				elif voto.voto == 'C':
+					tot_contrario += 1
+				elif voto.voto == 'R':
+					tot_favoravel_restricoes += 1
+				elif voto.voto == 'A':
+					tot_abstencao += 1
+				elif voto.voto == 'V':
+					tot_vista += 1
+				votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto))
+			votacao_incluir.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
+		reuniao_js.VotacaoJSONs.append(votacao_incluir)		
+
+	asJson = JsonConvert.ToJSON(reuniao_js)
+	fromJson = JsonConvert.FromJSON(asJson)
+	asJsonFromJson = JsonConvert.ToJSON(fromJson)
+	data = jsonref.loads(asJson)
+	#print(data)
+	return data

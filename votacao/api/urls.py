@@ -9,6 +9,7 @@ from consumer.lib.views import SPLReuniaoComissaoView
 #router = routers.DefaultRouter()
 #router.register(r'get_fake_calendario', views.FakeCalendarioViewSet, base_name='get_fake_calendario')
 
+
 urlpatterns = [
 	path('abre_votacao/<int:pac_id>/<int:par_id>/<codigo_projeto>/', views.abre_votacao, name='abre-votacao'),
 	path('fecha_votacao/<int:pac_id>/<int:par_id>/<codigo_projeto>/', views.fecha_votacao, name='fecha-votacao'),
@@ -17,9 +18,9 @@ urlpatterns = [
 	path('consome_projetos/<int:pac_id>/', views.consome_projetos, name='consome-projetos'),
 	path('vota/<tipo_voto>/', views.vota, name='vota'),
 	path('vota_restricao/<tipo_voto>/<restricao>/', views.vota_restricao, name='vota-restricao'),
-	#path('consome_reuniao_comissao/', views.consome_reuniao_comissao, name='consome-reuniao-comissao'),
 	path('consome_reuniao_comissao/', views.ConsomeReuniaoComissao.as_view(), name='consome-reuniao-comissao'),
 	path('consome_reuniao_comissao_range/<data_inicio>/<data_fim>/', views.consome_reunioes_range, name='consome-reuniao-comissao-range'),
+	path('relatorio_votacao/<int:pac_id>/', views.relatorio_votacao, name='relatorio-votacao'),
 ]	
 
 #urlpatterns += router.urls

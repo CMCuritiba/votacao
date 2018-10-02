@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.urls import include, path
+from django.conf.urls import url
 from . import views
 
 urlpatterns = [
@@ -8,4 +9,5 @@ urlpatterns = [
 	path('liberacao/', views.LiberacaoIndex.as_view(), name='liberacao-index'),
 	path('votacao/', views.VotacaoIndex.as_view(), name='votacao-index'),
 	path('relatorio/votacao/', views.RelatorioVotacaoIndex.as_view(), name='relatorio-votacao'),
+	path('relatorio/votacao/imprime/', views.RelatorioVotacao.as_view(), name='relatorio-votacao-imprime'),
 ]	
