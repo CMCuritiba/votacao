@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from datetime import datetime
 
-from votacao.votacao.forms import RelatorioVotacaoForm
+from votacao.votacao.forms import RelatorioVotacaoIndexForm
 
 #--------------------------------------------------------------------------------------
 # Teste pesquisa relatório
@@ -24,4 +24,4 @@ class RelatorioVotacaoFormTest(TestCase):
 
 
     def test_init(self):
-        form = RelatorioVotacaoForm()
+        form = RelatorioVotacaoIndexForm()

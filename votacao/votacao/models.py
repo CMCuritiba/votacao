@@ -24,6 +24,9 @@ class Votacao(models.Model):
 	codigo_proposicao = models.CharField(max_length=20)
 	status = models.CharField(max_length=1, default='F') # (A)berta, (F)echada, (V)otada
 
+	def lista_votos(self):
+		return self.voto_set.all().order_by('vereador')
+
 	def __unicode__(self):
 		return self.codigo_proposicao
 
@@ -57,10 +60,10 @@ class Voto(models.Model):
 	voto = models.CharField(max_length=1, choices=VOTO_CHOICES)
 
 	def __unicode__(self):
-		return self.votacao.codigo_proposicao
+		return self.voto
 
 	def __str__(self):
-		return self.votacao.codigo_proposicao
+		return self.voto
 
 #---------------------------------------------------------------------------------------------
 # Model Restricao

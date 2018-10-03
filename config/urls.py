@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.urls import include, re_path
+from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
@@ -11,14 +12,9 @@ from django.views.generic import TemplateView
 from django.contrib.messages.views import SuccessMessageMixin
 
 urlpatterns = [
-    #re_path(settings.ADMIN_URL, admin.site.urls),
     re_path(r'^autentica/', include('autentica.urls')),
     re_path(r'^admin/', include('votacao.votacao.urls')),
     re_path(r'^api/', include('votacao.api.urls')),
-    #re_path(r'^calendario/', include('calendario.calendario.urls')),
-    #re_path(r'^tinymce/', include('tinymce.urls')),
-
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

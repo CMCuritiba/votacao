@@ -33,14 +33,14 @@ class JSONVotacaoForm(forms.Form):
 #------------------------------------------------------------------------------------------
 # classe form utilizada para gerar relatório de votação
 #------------------------------------------------------------------------------------------
-class RelatorioVotacaoForm(forms.Form):
+class RelatorioVotacaoIndexForm(forms.Form):
 
     #def get_grupos(self, request):
         #return GrupoServico.objects.filter(setor__setor_id=request.session['setor_id']).order_by('descricao')
 
 
     def __init__(self, *args, **kwargs):
-        super(RelatorioVotacaoForm, self).__init__(*args, **kwargs)
+        super(RelatorioVotacaoIndexForm, self).__init__(*args, **kwargs)
 
         self.fields['data_inicio'] = forms.DateField(label="Data Início")
         self.fields['data_fim'] = forms.DateField(label="Data Fim", required=False)
@@ -73,3 +73,13 @@ class RelatorioVotacaoForm(forms.Form):
         )
         
         '''
+
+#------------------------------------------------------------------------------------------
+# classe form utilizada enviar dados seguros para relatório
+#------------------------------------------------------------------------------------------
+class RelatorioVotacaoForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(RelatorioVotacaoForm, self).__init__(*args, **kwargs)
+        
+        self.fields['pac_id'] = forms.IntegerField()

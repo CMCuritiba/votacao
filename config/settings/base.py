@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = [
      'ldapdb',
      'autentica',
      'consumer',
+     'easy_pdf',
 #     'tinymce',
 #     'corsheaders',
 ]
@@ -83,15 +84,15 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # ------------------------------------------------------------------------------
 MIDDLEWARE = [
 #    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'autentica.lib.error_handler.HandleBusinessExceptionMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # removido no Django 2: 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
 
