@@ -71,6 +71,6 @@ psycopg2-binary
 # Consumer
 https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-consumer-0.2.tar.gz?raw=true
 
-Relatórios
+Relatorios
 xhtml2pdf>=0.2b1
 django-easy-pdf
