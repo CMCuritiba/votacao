@@ -211,7 +211,7 @@ def relatorio_votacao(request, pac_id):
 	reuniao = consumer.consome_reuniao(request, rec_id)
 	con_id = reuniao['con_id']
 	rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
-	print(reuniao)
+	#print(reuniao)
 	rec_data = reuniao['rec_data']
 	rec_numero = reuniao['rec_numero']
 	comissao = consumer.consome_comissao(request, con_id)
