@@ -1,65 +1,19 @@
-{% extends "easy_pdf/base.html" %}
+{% extends "relatorio.html" %}
 {% load votacao_extras %}
 
-{% block layout_style %}
-    <style type="text/css">
-        @page {
-            size: {{ pagesize|default:"A4" }};
-            margin-left: 1.5cm;
-            margin-right: 1.5cm;
-            margin-top: 4cm;
-            margin-bottom: 1cm;
-            @frame header {
-                -pdf-frame-content: page-header;
-                margin-top: 1cm;
-                margin-right: 2mm;
-                margin-bottom: 1cm;
-                margin-left: 1.5cm;
-            }
-        }
-    </style>
-{% endblock %}
+{% block report_title %}Relatório de Votação{% endblock %}
 
-
-{% block extra_style %}
-    <style type="text/css">
-    	.header h1 {
-    		padding-left: 60px;
-    		padding-top:-55px;
-            font-size: 24px;
-            font-weight: normal;
-        }
-        .header h2 {
-            font-size: 18px;
-            font-weight: normal;
-        }
-        table.bordered {
-            border-top: 0.1pt solid #999999;
-            border-bottom: 0.1pt solid #999999;
-        }
-        table.reuniao {
+{% block my_style %}
+    table.reuniao {
             border-top: 0.1pt solid #999999;
         }
         tr.reuniao {
             padding-top: 5px;
         }
         tr.proposicao {
-        	padding-top: 5px;
-        }
-        tr, td, th { border: none; }
-        .logo { margin-bottom: 20px;}
-    </style>
+            padding-top: 5px;
+        }        
 {% endblock %} 
-
-{% block page_header %}
-	<div id="page-header">
-        <div class="header">
-        	<img src="{{''|brasao}}" height="40" style="margin-top:5px;margin-right:130px;"></img>
-        	<h1>Câmara Municipal de Curitiba</h1>
-            <h2 align="center">Relatório de Votação</h2>
-        </div>
-    </div>
-{% endblock %}
 
 {% block content %}
     <div id="content">
