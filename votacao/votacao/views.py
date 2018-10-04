@@ -19,10 +19,13 @@ from django.template import RequestContext
 from easy_pdf.views import PDFTemplateView
 
 from autentica.util.mixin import CMCLoginRequired, CMCAdminLoginRequired
+from cmcreport.lib.views import CMCReportView
+
 from votacao.votacao.api.autenticacao import CMCVereadorLoginRequired
 from votacao.votacao.forms import RelatorioVotacaoForm
 from votacao.votacao.models import Votacao, Voto, Restricao
 from votacao.api.views import relatorio_votacao
+
 
 #--------------------------------------------------------------------------------------
 # Admin Index
@@ -51,21 +54,21 @@ class RelatorioVotacaoIndex(CMCAdminLoginRequired, SuccessMessageMixin, Template
 #--------------------------------------------------------------------------------------
 # Relatorio Votacao impressao
 #--------------------------------------------------------------------------------------        
-class RelatorioVotacao(PDFTemplateView):
+class RelatorioVotacao(CMCReportView):
 	template_name = 'admin/relatorio/votacao/relatorio.html'
 	download_filename = 'relatorio_votacao.pdf'
 	pac_id = None
 	votacoes = []
 
 	def get_context_data(self, **kwargs):
-		context = super(PDFTemplateView, self).get_context_data(**kwargs)
+		context = super(CMCReportView, self).get_context_data(**kwargs)
 		context['title'] = 'Relatório de Votação'
 		context['pagesize'] = 'A4 portrait'
 		context['votacoes'] = self.votacoes
 		return context
 
 	def post(self, request, *args, **kwargs):
-		context = super(PDFTemplateView, self).get_context_data(**kwargs)
+		context = super(CMCReportView, self).get_context_data(**kwargs)
 		form = RelatorioVotacaoForm(data = request.POST)
 		if form.is_valid():
 			self.pac_id = form['pac_id'].value()

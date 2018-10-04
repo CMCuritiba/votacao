@@ -54,6 +54,7 @@ THIRD_PARTY_APPS = [
      'autentica',
      'consumer',
      'easy_pdf',
+     'cmcreport',
 #     'tinymce',
 #     'corsheaders',
 ]
