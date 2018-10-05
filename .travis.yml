@@ -21,7 +21,7 @@ install:
 
 before_script:
   #- python manage.py makemigrations autentica core --settings=config.settings.travis
-  - python manage.py makemigrations autentica core --settings=config.settings.travis
+  - python manage.py makemigrations autentica votacao --settings=config.settings.travis
   - python manage.py migrate --settings=config.settings.travis
 
 #before_script:
