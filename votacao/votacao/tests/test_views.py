@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.middleware import MessageMiddleware
+from unittest.mock import patch, MagicMock, Mock
 
 from autentica.models import User
 
@@ -73,7 +74,9 @@ class RelatorioVotacaoImprimeTest(TestCase):
 	def test_dummy(self):
 		self.assertEqual(1,1)		
 
-	def test_view_ok(self):
+	@patch('votacao.api.views.relatorio_votacao')
+	def test_view_ok(self, relatorio_votacao_mock):
+		relatorio_votacao_mock.return_value = []
 		request = self.factory.post('/votacao/admin/relatorio/votacao/imprime/', {'pac_id': 683})
 		self.setup_request(request)
 		response = RelatorioVotacao.as_view()(request)

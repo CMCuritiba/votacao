@@ -294,3 +294,53 @@ TEST_RUNNER = 'config.settings.travis.UnManagedModelTestRunner'
 MSCMC_SERVER = env('MSCMC_SERVER')
 
 AUTH_USER_MODEL = 'autentica.User'
+
+PIPELINE = {
+    'PIPELINE_ENABLED': False,
+    'JS_COMPRESSOR': False,
+    'CSS_COMPRESSOR': False,
+    'STYLESHEETS': {
+        'master': {
+            'source_filenames': (
+              'bootstrap/dist/css/bootstrap.css',
+              #'bootstrap-calendar/css/calendar.min.css',
+              'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css',
+              'datatables/media/css/jquery.dataTables.css',
+              'datatables/media/css/dataTables.bootstrap.css',
+              'datatables.net-responsive-bs/css/responsive.bootstrap.min.css',
+              #'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css',
+              #'fullcalendar/dist/fullcalendar.min.css',
+              'callout.css',
+              'estilos.css',
+              #'event.css',
+            ),
+            'output_filename': 'css/master.css',
+        },
+    },
+    'JAVASCRIPT': {
+        'master': {
+            'source_filenames': (
+              'jquery/jquery.js',
+              'moment/min/moment.min.js',
+              'moment/locale/pt-br.js',
+              'bootstrap/dist/js/bootstrap.min.js',
+              'underscore/underscore-min.js',
+              #'bootstrap-calendar/js/language/pt-BR.js',
+              #'bootstrap-calendar/js/calendar.min.js',
+              'bootstrap-datepicker/dist/js/bootstrap-datepicker.js',
+              'bootstrap-datepicker/dist/locales/bootstrap-datepicker.pt-BR.min.js',
+              'fontawesome/svg-with-js/js/fontawesome-all.min.js',
+              'datatables/media/js/jquery.dataTables.js',
+              'datatables/media/js/dataTables.bootstrap.js',
+              'datatables.net-responsive/js/dataTables.responsive.min.js',
+              'datatables.net-responsive-bs/js/responsive.bootstrap.min.js',
+              'datatables-datetime-moment/dist/js/datetime-moment.min.js',
+              #'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
+              #'fullcalendar/dist/fullcalendar.min.js',
+              #'fullcalendar/dist/gcal.min.js',
+              #'fullcalendar/dist/locale-all.min.js',
+            ),
+            'output_filename': 'js/master.js',
+        }
+    }
+}
