@@ -299,3 +299,5 @@ LOGGING = {
 TEST_RUNNER = 'config.settings.travis.UnManagedModelTestRunner'
 
 MSCMC_SERVER = env('MSCMC_SERVER')
+
+AUTH_USER_MODEL = 'autentica.User'
