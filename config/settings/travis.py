@@ -58,7 +58,17 @@ DJANGO_APPS = [
     #'django.contrib.admin',
 ]
 THIRD_PARTY_APPS = [
+    'pipeline',
+    'djangobower',
+    'crispy_forms',
     'rest_framework',
+    'django_python3_ldap',
+    'ldapdb',
+    'autentica',
+    'consumer',
+    'easy_pdf',
+    'cmcreport',
+    'django_nose',
 ]
 
 # Apps specific for this project go here.
