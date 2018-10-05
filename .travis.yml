@@ -5,6 +5,10 @@ python:
 
 services: postgresql
 
+env:
+  MSCMC_SERVER=https://mscmc-staging.cmc.pr.gov.br
+  DATABASE_TEST_URL=postgres:///votacao-test
+
 before_install:
   - export DJANGO_SETTINGS_MODULE=config.settings.travis
   - export DATABASE_URL=postgres:///votacao-test
