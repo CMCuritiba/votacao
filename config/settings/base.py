@@ -55,6 +55,7 @@ THIRD_PARTY_APPS = [
      'consumer',
      'easy_pdf',
      'cmcreport',
+     'django_nose',
 #     'tinymce',
 #     'corsheaders',
 ]
@@ -440,3 +441,5 @@ TINYMCE_DEFAULT_CONFIG = {
 SETTINGS_EXPORT = [
     'MSCMC_SERVER',
 ]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
