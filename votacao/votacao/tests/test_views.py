@@ -74,7 +74,7 @@ class RelatorioVotacaoImprimeTest(TestCase):
 	def test_dummy(self):
 		self.assertEqual(1,1)		
 
-	@patch('votacao.api.views.relatorio_votacao')
+	@patch('votacao.votacao.views.relatorio_votacao')
 	def test_view_ok(self, relatorio_votacao_mock):
 		relatorio_votacao_mock.return_value = []
 		request = self.factory.post('/votacao/admin/relatorio/votacao/imprime/', {'pac_id': 683})
