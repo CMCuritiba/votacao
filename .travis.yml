@@ -3,15 +3,14 @@ language: python
 python:
   - "3.5"
 
-services: postgresql
-
 env:
   MSCMC_SERVER=https://mscmc-staging.cmc.pr.gov.br
-  DATABASE_TEST_URL=postgres:///votacao-test
+  DATABASE_TEST_URL=sqlite:///votacao-test.db
+  DATABASE_URL=sqlite:///votacao.db
 
 before_install:
   - export DJANGO_SETTINGS_MODULE=config.settings.travis
-  - export DATABASE_URL=postgres:///votacao-test
+  - export DATABASE_URL=sqlite:///votacao.db
   - sudo apt-get install -y libenchant-dev  
   - sudo apt-get install -y libenchant1c2a
 
