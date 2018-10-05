@@ -14,7 +14,7 @@ from votacao.votacao.models import Votacao, Voto, Restricao
 class VereadorFactory(DjangoModelFactory):
 	class Meta:
 		model = Usuario
-	id = 1
+	id = 1000
 	first_name = 'Vereador Zezinho'
 	last_name = 'do Sabará'
 	lotado = '111'
