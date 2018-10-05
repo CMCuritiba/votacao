@@ -1,31 +1,44 @@
 # -*- coding: utf-8 -*-
+"""
+Django settings for travis
+
+For more information on this file, see
+https://docs.djangoproject.com/en/dev/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/dev/ref/settings/
+"""
 from __future__ import absolute_import, unicode_literals
 
 import environ, os
 
-def gettext_noop(s):
-    return s
+from django.test.runner import DiscoverRunner
+ 
+ 
+class UnManagedModelTestRunner(DiscoverRunner):
+ 
+    def setup_test_environment(self, *args, **kwargs):
+        from django.apps import apps
+        self.unmanaged_models = [m for m in apps.get_models() if not m._meta.managed]
+        for m in self.unmanaged_models:
+            m._meta.managed = True
+        super(UnManagedModelTestRunner, self).setup_test_environment(*args, **kwargs)
+ 
+    def teardown_test_environment(self, *args, **kwargs):
+        super(UnManagedModelTestRunner, self).teardown_test_environment(*args, **kwargs)
+        # reset unmanaged models
+        for m in self.unmanaged_models:
+            m._meta.managed = False
 
-ROOT_DIR = environ.Path(__file__) - 3
+
+
+env = environ.Env(DEBUG=(bool, False),)
+
+ROOT_DIR = environ.Path(__file__) - 3  # (chamados-cmc/config/settings/base.py - 3 = chamados-cmc/)
 APPS_DIR = ROOT_DIR.path('votacao')
 
-ALLOWED_HOSTS=['*']
+SECRET_KEY = 'TRAVIS'
 
-# Load operating system environment variables and then prepare to use them
-env = environ.Env()
-env.read_env(env_file=ROOT_DIR('.env'))
-
-# .env file, should load only in development environment
-READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
-
-if READ_DOT_ENV_FILE:
-    # Operating System Environment variables have precedence over variables defined in the .env file,
-    # that is to say variables from the .env files will only be used if not defined
-    # as environment variables.
-    env_file = str(ROOT_DIR.path('.env'))
-    print('Loading : {}'.format(env_file))
-    env.read_env(env_file)
-    print('The .env file has been loaded. See base.py for more information')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -42,22 +55,20 @@ DJANGO_APPS = [
     # 'django.contrib.humanize',
 
     # Admin
-    'django.contrib.admin',
+    #'django.contrib.admin',
 ]
 THIRD_PARTY_APPS = [
-     'pipeline',
-     'djangobower',
-     'crispy_forms',
-     'rest_framework',
-     'django_python3_ldap',
-     'ldapdb',
-     'autentica',
-     'consumer',
-     'easy_pdf',
-     'cmcreport',
-     'django_nose',
-#     'tinymce',
-#     'corsheaders',
+    'pipeline',
+    'djangobower',
+    'crispy_forms',
+    'rest_framework',
+    'django_python3_ldap',
+    'ldapdb',
+    'autentica',
+    'consumer',
+    'easy_pdf',
+    'cmcreport',
+    'django_nose',
 ]
 
 # Apps specific for this project go here.
@@ -67,50 +78,25 @@ LOCAL_APPS = [
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-'''
-CORS_ORIGIN_ALLOW_ALL           = True
-CORS_REPLACE_HTTPS_REFERER      = False
-HOST_SCHEME                     = "http://"
-SECURE_PROXY_SSL_HEADER         = None
-SECURE_SSL_REDIRECT             = False
-SESSION_COOKIE_SECURE           = False
-CSRF_COOKIE_SECURE              = False
-SECURE_HSTS_SECONDS             = None
-SECURE_HSTS_INCLUDE_SUBDOMAINS  = False
-SECURE_FRAME_DENY               = False
-'''
-
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
 MIDDLEWARE = [
-#    'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'autentica.lib.error_handler.HandleBusinessExceptionMiddleware',
-    # removido no Django 2: 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 ]
-
-# ALTERAÇÕES NO USER PARA GUARDAR INFO DO LDAP
-# ------------------------------------------------------------------------------
-
-AUTH_USER_MODEL = 'autentica.User'
-
-# SERVIDOR DE MICRO SERVICOS
-# ------------------------------------------------------------------------------
-MSCMC_SERVER = env('MSCMC_SERVER')
 
 # DEBUG
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = env.bool('DJANGO_DEBUG', True)
+DEBUG = False
 
 # FIXTURE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -118,6 +104,10 @@ DEBUG = env.bool('DJANGO_DEBUG', True)
 FIXTURE_DIRS = (
     str(APPS_DIR.path('fixtures')),
 )
+
+# EMAIL CONFIGURATION
+# ------------------------------------------------------------------------------
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -133,15 +123,10 @@ MANAGERS = ADMINS
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    'ldap': {
-        'ENGINE': 'ldapdb.backends.ldap',
-        'NAME': env('LDAP_AUTH_URL'),
-     },
-    'default': env.db(),
-}
-DATABASES['default']['ATOMIC_REQUESTS'] = True
+        'default': env.db(),
+    }
+#DATABASES['default']['ATOMIC_REQUESTS'] = True
 
-DATABASE_ROUTERS = ['ldapdb.router.Router']
 
 
 # GENERAL CONFIGURATION
@@ -151,13 +136,9 @@ DATABASE_ROUTERS = ['ldapdb.router.Router']
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
 TIME_ZONE = 'America/Sao_Paulo'
-#USE_TZ=True
+
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = 'pt-BR'
-
-LANGUAGES = [
-    ('pt-br', gettext_noop('Brazilian Portuguese')),
-]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
@@ -169,7 +150,7 @@ USE_I18N = True
 USE_L10N = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
-#USE_TZ = True
+USE_TZ = True
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -201,15 +182,11 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'django_settings_export.settings_export',
                 # Your stuff: custom template context processors go here
             ],
         },
     },
 ]
-
-# See: http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # STATIC FILE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -217,19 +194,17 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 STATIC_ROOT = str(ROOT_DIR('staticfiles'))
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#static-url
-STATIC_URL = '/static/'
+STATIC_URL = '/staticfiles/'
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [
     str(APPS_DIR.path('static')),
-    str(ROOT_DIR.path('components/bower_components')),
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
 ]
 
 # MEDIA CONFIGURATION
@@ -270,7 +245,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # AUTHENTICATION CONFIGURATION
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = [
-    "django_python3_ldap.auth.LDAPBackend",
     'django.contrib.auth.backends.ModelBackend',
  ]
 
@@ -298,6 +272,10 @@ LOGGING = {
         },
     },
     "loggers": {
+        "django_python3_ldap": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
         "django": {
             "handlers": ["console"],
             "level": "ERROR",  
@@ -311,8 +289,11 @@ LOGGING = {
     },
 }
 
-# PIPELINE
-# ------------------------------------------------------------------------------
+TEST_RUNNER = 'config.settings.travis.UnManagedModelTestRunner'
+
+MSCMC_SERVER = env('MSCMC_SERVER')
+
+AUTH_USER_MODEL = 'autentica.User'
 
 PIPELINE = {
     'PIPELINE_ENABLED': False,
@@ -363,83 +344,3 @@ PIPELINE = {
         }
     }
 }
-
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
-#STATICFILES_STORAGE = 'django_pipeline_forgiving.storages.PipelineForgivingStorage'
-
-# BOWER
-# ------------------------------------------------------------------------------
-
-BOWER_COMPONENTS_ROOT = str(ROOT_DIR.path('components'))
-BOWER_INSTALLED_APPS = (
-    'jquery#1.9.1',
-    #'jquery',
-    'underscore',
-    'bootstrap#3',
-    #'bootstrap-calendar',
-    #'jasny-bootstrap',
-    'datatables',
-    'datatables-bootstrap3',
-    'bootstrap-3-datepicker',
-    'bootstrap-datepicker',
-    'datatables.net-responsive-bs',
-    'datatables-datetime-moment',
-    #'eonasdan-bootstrap-datetimepicker#latest',
-    #'bootstrap3-datetimepicker',
-    #'vue',
-    #'vue-strap',
-    'fontawesome',
-    'moment',
-    #'fullcalendar',
-    #'bootstrap-select'
-)
-
-# LDAP
-# ------------------------------------------------------------------------------
-#LDAP_AUTH_URL = "ldap://ldap"
-LDAP_AUTH_URL = env('LDAP_AUTH_URL', default='')
-LDAP_AUTH_USE_TLS = env('LDAP_AUTH_USE_TLS', default=False, cast=bool)
-LDAP_AUTH_SEARCH_BASE = env('LDAP_AUTH_SEARCH_BASE', default='')
-LDAP_AUTH_OBJECT_CLASS = env('LDAP_AUTH_OBJECT_CLASS', default='')
-LDAP_AUTH_USER_FIELDS = {
-    "username": env('LDAP_AUTH_USER_FIELDS_USERNAME', default=''),
-    "first_name": env('LDAP_AUTH_USER_FIELDS_FIRST_NAME', default=''),
-    "last_name": env('LDAP_AUTH_USER_FIELDS_LAST_NAME', default=''),
-    "email": env('LDAP_AUTH_USER_FIELDS_EMAIL', default=''),
-    #"matricula": env('LDAP_AUTH_USER_FIELDS_MATRICULA', default=''),
-    "pessoa": env('LDAP_AUTH_USER_FIELDS_PESSOA', default=''),
-    "lotado": env('LDAP_AUTH_USER_FIELDS_LOTADO', default=''),
-    "chefia": env('LDAP_AUTH_USER_FIELDS_CHEFIA', default=''),
-}
-LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
-LDAP_AUTH_CLEAN_USER_DATA = "django_python3_ldap.utils.clean_user_data"
-LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
-LDAP_AUTH_FORMAT_SEARCH_FILTERS = "django_python3_ldap.utils.format_search_filters"
-LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
-LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = None
-LDAP_AUTH_CONNECTION_USERNAME = None
-LDAP_AUTH_CONNECTION_PASSWORD = None
-
-#X_FRAME_OPTIONS = 'SAMEORIGIN'
-
-TINYMCE_SPELLCHECKER = True
-TINYMCE_COMPRESSOR = True
-TINYMCE_DEFAULT_CONFIG = {
-    'selector': 'textarea',
-    'theme': 'modern',
-    'plugins': 'link image preview codesample contextmenu table code lists',
-    'toolbar1': 'formatselect | bold italic underline | alignleft aligncenter alignright alignjustify '
-               '| bullist numlist | outdent indent | table | link image | codesample | preview code',
-    'contextmenu': 'formats | link image',
-    'menubar': False,
-    'inline': False,
-    'statusbar': True,
-    'width': 'auto',
-    'height': 360,
-}
-
-SETTINGS_EXPORT = [
-    'MSCMC_SERVER',
-]
-
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

@@ -206,7 +206,6 @@ def consome_reunioes_range(request, data_inicio, data_fim):
 def relatorio_votacao(request, pac_id):
 	consumer = MSCMCConsumer()
 
-
 	rec_id = consumer.consome_rec_id(request, pac_id)
 	reuniao = consumer.consome_reuniao(request, rec_id)
 	con_id = reuniao['con_id']

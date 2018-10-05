@@ -80,3 +80,10 @@ jsonref
 
 # Biblioteca relatorios
 https://github.com/CMCuritiba/django-cmc-report/blob/master/dist/django-cmc-report-0.1.tar.gz?raw=true
+
+# Nose
+django-nose==1.4.6
+nose==1.3.7
+
+# Coverage
+coverage==4.5.1
