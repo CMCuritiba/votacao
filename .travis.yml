@@ -8,6 +8,8 @@ services: postgresql
 before_install:
   - export DJANGO_SETTINGS_MODULE=config.settings.travis
   - export DATABASE_URL=postgres:///votacao-test
+  - sudo apt-get install -y libenchant-dev  
+  - sudo apt-get install -y libenchant1c2a
 
 # comando para instalar dependencias
 install: 
