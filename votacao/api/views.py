@@ -184,7 +184,7 @@ def vota_restricao(request, tipo_voto, restricao):
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 				return response
-			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': restricao}, status=200)
+			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': restricao.voto.voto}, status=200)
 	return response	
 
 # -----------------------------------------------------------------------------------
