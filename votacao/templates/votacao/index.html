@@ -7,8 +7,10 @@
 
 
 <div class="panel panel-primary">
+    <input type="hidden" name="numero_projeto" id="numero_projeto"/>
     <input type="hidden" name="votacao" id="votacao"/>
     <input type="hidden" name="tipo_voto" id="tipo_voto"/>
+    <input type="hidden" name="id_texto" id="id_texto"/>
     <div id="projeto" class="panel-heading">Tela de votação de projetos</div>
         <div class="panel-body">
             <div class="row">
@@ -71,6 +73,25 @@
   </div>
 </div>
 
+<!-- Modal Contrário-->
+<div class="modal fade" id="votoModalContrario" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+      </div>
+      <div class="modal-body">
+        <h2><b>Por favor, confirme o seu voto <span id="desc_tipo_voto"></span></b></h2>
+        <div id="div_combo_contrario"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao">Confirma</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}    
 
 
@@ -94,6 +115,10 @@
                     restricao = $('#restricao').val();
                     request_url = "/api/vota_restricao/" + tipo_voto + "/" + restricao + "/";
                 }
+                else if (tipo_voto == 'C') {
+                    id_texto = $('#combo_contrario option:selected').val();
+                    request_url = "/api/vota_contrario/" + tipo_voto + "/" + id_texto + "/";
+                }
                 else {
                     request_url = "/api/vota/" + tipo_voto + "/";
                 }
@@ -116,6 +141,7 @@
 
                 $("#votoModal").modal('hide');
                 $("#votoModalRestricoes").modal('hide');
+                $("#votoModalContrario").modal('hide');
             })
         });
 
@@ -128,11 +154,12 @@
                 accepts: 'application/json',
                 dataType: 'json',
                 success: function(result){
-                    console.log(result);
+                    //console.log(result);
                     if (result.length > 0) {
                         limpaCampos();
                         carregaCampos(result);
                         montaBotoes(result[0].votado, result[0].tipo_voto);
+                        verifica_contrario(result[0].codigo_proposicao);
                     }
                     else {
                         limpaCampos();
@@ -154,6 +181,7 @@
         }
 
         function carregaCampos(result) {
+            $('#numero_projeto').val(result[0].codigo_proposicao);
             $('#votacao').val(result[0].id);
             $('#projeto').append('<h1>' + result[0].codigo_proposicao + '</h1>');
             $('#iniciativa').append('Iniciativa: ' + result[0].iniciativa);
@@ -166,7 +194,7 @@
             if (!status_voto) {
                 $('#botoes').append('<button type="button" class="btn btn-success btn-lg botao" onclick="javascript:votaFavoravel();"> FAVORÁVEL </button>');
                 $('#botoes').append('<button type="button" class="btn btn-warning btn-lg botao" onclick="javascript:votaFavoravelRestricoes();"> FAVORÁVEL COM RESTRIÇÕES </button>');
-                $('#botoes').append('<button type="button" class="btn btn-danger btn-lg botao" onclick="javascript:votaContrario();"> CONTRÁRIO </button>');
+                $('#botoes').append('<button type="button" id="bt_contrario" class="btn btn-danger btn-lg botao" onclick="javascript:votaContrario();"> CONTRÁRIO </button>');
                 $('#botoes').append('<br/>');
                 $('#botoes').append('<br/>');
                 $('#botoes').append('<button type="button" class="btn btn-primary btn-lg botao" onclick="javascript:votaAbstencao();"> ABSTENÇÃO </button>');
@@ -196,7 +224,7 @@
 
         function votaContrario() {
             $('#tipo_voto').val("C");
-            modal = $('#votoModal').modal();
+            modal = $('#votoModalContrario').modal();
             modal.find('#desc_tipo_voto').removeClass();
             modal.find('#desc_tipo_voto').addClass("text-danger");
             modal.find('#desc_tipo_voto').html("CONTRÁRIO");
@@ -231,6 +259,40 @@
                 return '<h2 class="text-info">VISTA</h2>';
             else
                 return '<h2 class="text-danger">ERRO</h2>'
+        }
+
+        function verifica_contrario(codigo_proposicao) {
+            request_url = '/api/textos_conclusao/' + codigo_proposicao + '/';
+            //console.log("VERIFICA CONTRARIO");
+            $.ajax({
+                url: request_url,
+                type: 'GET',
+                accepts: 'application/json',
+                dataType: 'json',
+                success: function(result){
+                    //console.log(result);
+                    if (result.length > 0) {
+                        //console.log("HABILITAR BOTAO CONTRARIO");
+                        $('#bt_contrario').attr("enabled","enabled");
+                        toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
+                        $.each(result, function(index, element) {
+                            toAppend += '<option value="' + element.txt_id + '">' + element.vereador + '</option>';
+                        });
+                        toAppend += '</select>';
+                        //console.log(toAppend);
+                        $('#div_combo_contrario').empty();
+                        $('#div_combo_contrario').append(toAppend);
+                        $('.selectpicker').selectpicker();
+                    }
+                    else {
+                        //console.log("DESABILITAR BOTAO CONTRARIO");
+                        $('#bt_contrario').attr("disabled","disabled");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Problema ao carregar informações do projeto.');
+                }
+            })
         }
 
     </script>
