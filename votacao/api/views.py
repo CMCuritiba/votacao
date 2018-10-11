@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.conf import settings
 
 from votacao.votacao.forms import JSONVotacaoForm
-from votacao.votacao.models import Votacao, Voto, Restricao
+from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario
 from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert
 
 import json
@@ -24,7 +24,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from consumer.lib.views import SPLReuniaoComissaoView
 from consumer.lib.msconsumer import MSCMCConsumer
-
+from consumer.lib.helper import ServiceHelper
 
 
 # -----------------------------------------------------------------------------------
@@ -258,3 +258,30 @@ def relatorio_votacao(request, pac_id):
 	data = jsonref.loads(asJson)
 	#print(data)
 	return data
+
+# -----------------------------------------------------------------------------------
+# chamada API para consumir textos de conclusao
+# -----------------------------------------------------------------------------------
+def consome_textos_conclusao(request, pro_codigo):
+	helper = ServiceHelper()
+	return helper.get_textos_conclusao(pro_codigo)
+
+# -----------------------------------------------------------------------------------
+# chamada API para votar contrário
+# -----------------------------------------------------------------------------------
+def vota_contrario(request, tipo_voto, id_texto):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		votacao = request.POST['votacao']
+		if (votacao != None):
+			try:
+				votacao = Votacao.objects.get(id=votacao)
+				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+				contrario = VotoContrario.objects.create(voto=voto, id_texto=id_texto)
+			except Votacao.DoesNotExist:
+				response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
+				return response
+			response = JsonResponse({'status':'true','message':'Votação contrária efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+	return response		

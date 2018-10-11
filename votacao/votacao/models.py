@@ -81,3 +81,20 @@ class Restricao(models.Model):
 
 	def __str__(self):
 		return self.restricao
+
+#---------------------------------------------------------------------------------------------
+# Model VotoContrario
+#---------------------------------------------------------------------------------------------
+@python_2_unicode_compatible
+class VotoContrario(models.Model):
+	class Meta:
+		verbose_name_plural = 'Votos Contrários'
+
+	voto = models.ForeignKey(Voto, on_delete=models.PROTECT)
+	id_texto = models.IntegerField()
+
+	def __unicode__(self):
+		return self.id_texto
+
+	def __str__(self):
+		return self.id_texto

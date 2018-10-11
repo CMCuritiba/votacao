@@ -26,7 +26,6 @@ from votacao.votacao.forms import RelatorioVotacaoForm
 from votacao.votacao.models import Votacao, Voto, Restricao
 from votacao.api.views import relatorio_votacao
 
-
 #--------------------------------------------------------------------------------------
 # Admin Index
 #--------------------------------------------------------------------------------------    

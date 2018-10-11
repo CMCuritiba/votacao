@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from braces import views
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
-import requests
+import requests, logging, functools
 
 from autentica.util.mixin import CMCLoginRequired, CMCAdminLoginRequired
 #from ..core.models import SetorChamado, Chamado
