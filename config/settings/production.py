@@ -221,6 +221,13 @@ LOGGING = {
             'handlers': ['console', ],
             'propagate': False,
         },
+
+        'votacao': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            # required to avoid double logging with root logger
+            'propagate': False,
+        },
     },
 }
 #SENTRY_CELERY_LOGLEVEL = env.int('DJANGO_SENTRY_LOG_LEVEL', logging.INFO)
