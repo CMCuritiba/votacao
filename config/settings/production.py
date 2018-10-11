@@ -199,11 +199,11 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'votacao.log',
-        },
+#        'file': {
+#            'level': 'DEBUG',
+#            'class': 'logging.FileHandler',
+#            'filename': 'votacao.log',
+#        },
 
     },
     'loggers': {
@@ -228,17 +228,17 @@ LOGGING = {
             'propagate': False,
         },
 
-        'votacao': {
-            'level': 'INFO',
-            'handlers': ['console', 'file'],
+#        'votacao': {
+#            'level': 'INFO',
+#            'handlers': ['console', 'file'],
             # required to avoid double logging with root logger
-            'propagate': False,
-        },
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
+#            'propagate': False,
+#        },
+#        'django': {
+#            'handlers': ['file'],
+#            'level': 'DEBUG',
+#            'propagate': True,
+#        },
     },
 }
 #SENTRY_CELERY_LOGLEVEL = env.int('DJANGO_SENTRY_LOG_LEVEL', logging.INFO)
