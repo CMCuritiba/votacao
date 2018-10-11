@@ -198,7 +198,13 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
-        }
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'votacao.log',
+        },
+
     },
     'loggers': {
         'django.db.backends': {
@@ -224,9 +230,14 @@ LOGGING = {
 
         'votacao': {
             'level': 'INFO',
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             # required to avoid double logging with root logger
             'propagate': False,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
