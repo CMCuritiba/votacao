@@ -356,6 +356,8 @@ PIPELINE = {
               'datatables.net-responsive/js/dataTables.responsive.min.js',
               'datatables.net-responsive-bs/js/responsive.bootstrap.min.js',
               'datatables-datetime-moment/dist/js/datetime-moment.min.js',
+              'axios/dist/axios.min.js',
+              'vue/dist/vue.min.js',
               #'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
               #'fullcalendar/dist/fullcalendar.min.js',
               #'fullcalendar/dist/gcal.min.js',
@@ -393,6 +395,8 @@ BOWER_INSTALLED_APPS = (
     #'vue-strap',
     'fontawesome',
     'moment',
+    'axios',
+    'vue',
     #'fullcalendar',
     #'bootstrap-select'
 )
