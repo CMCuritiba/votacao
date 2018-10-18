@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.urls import include, re_path
+from django.urls import include, re_path, path
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -10,11 +10,13 @@ from django.views.generic import TemplateView
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from django.contrib.messages.views import SuccessMessageMixin
+import votacao.votacao.views as viewsadmin
 
 urlpatterns = [
     re_path(r'^autentica/', include('autentica.urls')),
     re_path(r'^admin/', include('votacao.votacao.urls')),
     re_path(r'^api/', include('votacao.api.urls')),
+    path('', viewsadmin.AdminIndex.as_view(), name='index'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
