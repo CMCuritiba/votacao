@@ -38,6 +38,8 @@
 
         $(document).ready(function() {
 
+            $.fn.dataTable.ext.errMode = 'none';
+
             tableReunioes = $('#treunioes').DataTable({
                 "fnInitComplete": function(oSettings, json) {
                     inicializaSelecao();
@@ -324,7 +326,7 @@
                 accepts: 'application/json',
                 dataType: 'json',
                 success: function(result){
-                    console.log(result.status);
+                    //console.log(result.status);
                     if (result.length > 0) {
                         if (result.status)
                             return false;
