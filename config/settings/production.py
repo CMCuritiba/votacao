@@ -254,3 +254,7 @@ LOGGING = {
 # ------------------------------------------------------------------------------
 
 #CELERY_ACCEPT_CONTENT = ['json']
+
+CRONJOBS = [
+   ('00 00 * * *', 'votacao.cron.jobs.fecha_votacoes')
+]
