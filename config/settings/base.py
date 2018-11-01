@@ -56,6 +56,7 @@ THIRD_PARTY_APPS = [
      'easy_pdf',
      'cmcreport',
      'django_nose',
+     'django_crontab',
 #     'tinymce',
 #     'corsheaders',
 ]
@@ -450,3 +451,7 @@ SETTINGS_EXPORT = [
 ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+CRONJOBS = [
+   ('01 00 * * *', 'votacao.cron.jobs.fecha_votacoes', '>> cron_jobs.log')
+]
