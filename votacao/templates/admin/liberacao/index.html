@@ -32,12 +32,35 @@
 {% block extra_javascript %}
 
     <script>
+
         var tableReunioes;
         var tableProjetos;
-        var algumaAberta = verifica_aberto();
+        var algumAberto=false;
+
+
+        function verifica_aberto() {
+            request_url = "/api/verifica_abertos/";
+
+            $.ajax({
+                url: request_url,
+                type: 'GET',
+                accepts: 'application/json',
+                dataType: 'json',
+                success: function(result){
+                    if (result.status == 'false') {
+                        algumAberto = false;
+                    }
+                    else {
+                        algumAberto = true;
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Problema ao carregar informações do projeto.');
+                }
+            })
+        }
 
         $(document).ready(function() {
-
             $.fn.dataTable.ext.errMode = 'none';
 
             tableReunioes = $('#treunioes').DataTable({
@@ -192,7 +215,7 @@
                             if (full.status == 'A') {
                                 return "<a href='javascript:fechaVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-danger'>Fechar Votação</span></a>";
                             }
-                            else if (full.status == 'F' && !algumaAberta) {
+                            else if (full.status == 'F' && algumAberto) {
                                 return "<a href='javascript:abreVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-success'>Abrir Votação</span></a>";
                             }
                             else if (full.status == 'V') {
@@ -255,7 +278,9 @@
         });
 
         function carregaProjetos(pac_id, titulo) {
+
             url = "/api/consome_projetos/" + pac_id + "/";
+            verifica_aberto();
             $('#tit_reuniao').empty();
             $('#tit_reuniao').append(titulo);
             tableProjetos.ajax.url(url).load();
@@ -291,10 +316,10 @@
                     console.log(xhr);
                 }
             })
+            verifica_aberto();
         }
 
         function fechaVotacao(pac_id, par_id, codigo_proposicao) {
-            algumaAberta = false;
             request_url = "/api/fecha_votacao/" + pac_id + "/" + par_id + "/" + codigo_proposicao + "/";
 
             $.ajax({
@@ -315,31 +340,10 @@
                     console.log(xhr);
                 }
             })
+            verifica_aberto();
         }
 
-        function verifica_aberto() {
-            request_url = "/api/verifica_abertos/";
-
-            $.ajax({
-                url: request_url,
-                type: 'GET',
-                accepts: 'application/json',
-                dataType: 'json',
-                success: function(result){
-                    //console.log(result.status);
-                    if (result.length > 0) {
-                        if (result.status)
-                            return false;
-                        else
-                            return true;
-                    }
-                    return true;
-                },
-                error: function(xhr, status, error) {
-                    console.log('Problema ao carregar informações do projeto.');
-                }
-            })
-        }
+        
 
     </script>
 
