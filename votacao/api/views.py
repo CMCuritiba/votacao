@@ -26,6 +26,9 @@ from consumer.lib.views import SPLReuniaoComissaoView
 from consumer.lib.msconsumer import MSCMCConsumer
 from consumer.lib.helper import ServiceHelper
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 # -----------------------------------------------------------------------------------
 # chamada API para abrir um projeto para votação
@@ -41,8 +44,10 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 				votacao = Votacao.objects.get(par_id=par_id)
 				votacao.status = 'A'
 				votacao.save()
+				logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
 			except Votacao.DoesNotExist:
 				votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
+				logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
 			response = JsonResponse({'status':'true','message':'Projeto foi aberto para votação'}, status=200)
 	return response
 
@@ -96,7 +101,7 @@ def formata_projeto(projeto):
 # chamada API para fechar um projeto para votação
 # -----------------------------------------------------------------------------------
 def fecha_votacao(request, pac_id, par_id, codigo_projeto):
-	response = JsonResponse({'status':'false','message':'Erro ao tentar fechar projeto para votação'}, status=404)
+	response = JsonResponse({'status':'false','message':'Erro ao tentar encerrar votação para o projeto'}, status=404)
 
 	if request.method == 'POST':
 		widget_json = {}
@@ -104,7 +109,8 @@ def fecha_votacao(request, pac_id, par_id, codigo_projeto):
 			votacao = Votacao.objects.get(par_id=par_id)
 			votacao.status = 'V'
 			votacao.save()
-			response = JsonResponse({'status':'true','message':'Projeto foi aberto para votação'}, status=200)
+			logger.info("Votação para projeto %s encerrada por %s", codigo_projeto, request.user.username)
+			response = JsonResponse({'status':'true','message':'Projeto com votação encerrada'}, status=200)
 	return response	
 
 # -----------------------------------------------------------------------------------
@@ -161,6 +167,7 @@ def vota(request, tipo_voto):
 			try:
 				votacao = Votacao.objects.get(id=votacao)
 				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+				logger.info("Voto %s por %s", tipo_voto, request.user.username)
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 				return response
@@ -181,6 +188,7 @@ def vota_restricao(request, tipo_voto, restricao):
 				votacao = Votacao.objects.get(id=votacao)
 				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
 				restricao = Restricao.objects.create(voto=voto, restricao=restricao)
+				logger.info("Voto %s por %s", tipo_voto, request.user.username)
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 				return response
@@ -280,6 +288,7 @@ def vota_contrario(request, tipo_voto, id_texto):
 				votacao = Votacao.objects.get(id=votacao)
 				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
 				contrario = VotoContrario.objects.create(voto=voto, id_texto=id_texto)
+				logger.info("Voto %s por %s", tipo_voto, request.user.username)
 			except Votacao.DoesNotExist:
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
 				return response

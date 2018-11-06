@@ -48,10 +48,12 @@
                 dataType: 'json',
                 success: function(result){
                     if (result.status == 'false') {
-                        algumAberto = false;
+                        algumAberto = true;
+                        console.log(algumAberto);
                     }
                     else {
-                        algumAberto = true;
+                        algumAberto = false;
+                        console.log(algumAberto);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -215,7 +217,7 @@
                             if (full.status == 'A') {
                                 return "<a href='javascript:fechaVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-danger'>Fechar Votação</span></a>";
                             }
-                            else if (full.status == 'F' && algumAberto) {
+                            else if (full.status == 'F' && !algumAberto) {
                                 return "<a href='javascript:abreVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-success'>Abrir Votação</span></a>";
                             }
                             else if (full.status == 'V') {
@@ -308,6 +310,7 @@
                 accepts: 'application/json',
                 dataType: 'json',
                 success: function(result){
+                    verifica_aberto();
                     tableProjetos.ajax.reload(null, false);
                 },
                 error: function(xhr, status, error) {
@@ -316,7 +319,6 @@
                     console.log(xhr);
                 }
             })
-            verifica_aberto();
         }
 
         function fechaVotacao(pac_id, par_id, codigo_proposicao) {
@@ -332,6 +334,7 @@
                 accepts: 'application/json',
                 dataType: 'json',
                 success: function(result){
+                    verifica_aberto();
                     tableProjetos.ajax.reload(null, false);
                 },
                 error: function(xhr, status, error) {
@@ -340,7 +343,6 @@
                     console.log(xhr);
                 }
             })
-            verifica_aberto();
         }
 
         
