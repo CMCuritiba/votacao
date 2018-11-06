@@ -176,42 +176,88 @@ CACHES = {
 # Sentry Configuration
 #SENTRY_DSN = env('DJANGO_SENTRY_DSN')
 #SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
+
+
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'root': {
-        'level': 'WARNING',
-#        'handlers': ['sentry', ],
-    },
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d %(message)s'
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+        },
+        "file" : {
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
         },
     },
-    'handlers': {
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+        "file" : {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "votacao.log",
+            "formatter": "file",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",  
+            "propagate": True,
+        },
+         'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        "": {
+            "handlers": ["console", "file"],
+            "level": "INFO",  
+            "propagate": True,
+        },
+    },
+}
+
+
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': True,
+#    'root': {
+#        'level': 'WARNING',
+#        'handlers': ['sentry', ],
+#    },
+#    'formatters': {
+#        'verbose': {
+#            'format': '%(levelname)s %(asctime)s %(module)s '
+#                      '%(process)d %(thread)d %(message)s'
+#        },
+#    },
+#    'handlers': {
 #        'sentry': {
 #            'level': 'ERROR',
 #            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
 #        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
+#        'console': {
+#            'level': 'DEBUG',
+#            'class': 'logging.StreamHandler',
+#            'formatter': 'verbose'
+#        },
 #        'file': {
 #            'level': 'DEBUG',
 #            'class': 'logging.FileHandler',
 #            'filename': 'votacao.log',
 #        },
 
-    },
-    'loggers': {
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console', ],
-            'propagate': False,
-        },
+#    },
+#    'loggers': {
+#        'django.db.backends': {
+#            'level': 'ERROR',
+#            'handlers': ['console', ],
+#            'propagate': False,
+#        },
 #        'raven': {
 #            'level': 'DEBUG',
 #            'handlers': ['console', ],
@@ -222,11 +268,11 @@ LOGGING = {
 #            'handlers': ['console', ],
 #            'propagate': False,
 #        },
-        'django.security.DisallowedHost': {
-            'level': 'ERROR',
-            'handlers': ['console', ],
-            'propagate': False,
-        },
+#        'django.security.DisallowedHost': {
+#            'level': 'ERROR',
+#            'handlers': ['console', ],
+#            'propagate': False,
+#        },
 
 #        'votacao': {
 #            'level': 'INFO',
@@ -239,8 +285,8 @@ LOGGING = {
 #            'level': 'DEBUG',
 #            'propagate': True,
 #        },
-    },
-}
+#    },
+#}
 #SENTRY_CELERY_LOGLEVEL = env.int('DJANGO_SENTRY_LOG_LEVEL', logging.INFO)
 #RAVEN_CONFIG = {
 #    'CELERY_LOGLEVEL': env.int('DJANGO_SENTRY_LOG_LEVEL', logging.INFO),

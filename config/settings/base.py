@@ -292,10 +292,25 @@ ADMIN_URL = r'^admin/'
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+        },
+        "file" : {
+            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+        },
+    },
     "handlers": {
         "console": {
             "level": "INFO",
             "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
+        "file" : {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "votacao.log",
+            "formatter": "file",
         },
     },
     "loggers": {
@@ -308,6 +323,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'ERROR',
             'propagate': False,
+        },
+        "": {
+            "handlers": ["console", "file"],
+            "level": "INFO",  
+            "propagate": True,
         },
     },
 }

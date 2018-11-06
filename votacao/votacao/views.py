@@ -27,6 +27,10 @@ from votacao.votacao.models import Votacao, Voto, Restricao
 from votacao.api.views import relatorio_votacao
 from votacao.cron.jobs import fecha_votacoes
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 #--------------------------------------------------------------------------------------
 # Admin Index
 #--------------------------------------------------------------------------------------    
@@ -86,6 +90,7 @@ class FechaTodasAbertasIndex(CMCAdminLoginRequired, SuccessMessageMixin, Templat
 # Fecha Votações Abertas
 #--------------------------------------------------------------------------------------    
 def fecha_abertas(request):
+	logger.info("Fechamento forçado de votações abertas feito por %s", request.user.username)
 	if request.method == 'POST':
 		form = FechaVotacoesForm(request, request.POST)
 		if form.is_valid():
