@@ -83,3 +83,12 @@ class RelatorioVotacaoForm(forms.Form):
         super(RelatorioVotacaoForm, self).__init__(*args, **kwargs)
         
         self.fields['pac_id'] = forms.IntegerField()
+
+#------------------------------------------------------------------------------------------
+# classe form utilizada fechar votações
+#------------------------------------------------------------------------------------------
+class FechaVotacoesForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super(FechaVotacoesForm, self).__init__(*args, **kwargs)
+        

@@ -1,0 +1,49 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Fechamento de Votações Abertas{% endblock %}
+
+{% block content %}
+    <form method="POST" id="formFechaAbertas" action="/admin/fecha/abertas/fecha">
+        {% csrf_token %}
+        <p>Esta operação irá definir todas as votações que ficaram abertas como Votadas. Os votos destas votações não serão perdidos ou modificados.</p>
+        <p>Esta opção foi disponibilizada para que o administrador do sistema possa ele mesmo fechar as votações anteriores que ficaram abertas e que não estão mais visíveis no sistema.</p>
+        <button type="button" class="btn btn-danger btn-lg" onClick="javascript:confirma();">Fecha Votações Abertas</button>
+    </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="fechaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+          </div>
+          <div class="modal-body">
+            <h2><b>Todas as votações Abertas serão definidas como Votadas</b></h2>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary btn-lg" id="confirmaFechamento">Confirma</button>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}    
+
+{% block extra_javascript %}
+
+    <script>
+        $(document).ready(function() {
+            $("button#confirmaFechamento").click(function() {
+                $("#fechaModal").modal('hide');
+                $("#formFechaAbertas").submit();
+            })
+        });
+
+        function confirma() {
+            modal = $('#fechaModal').modal();
+        }
+
+    </script>
+
+{% endblock %}

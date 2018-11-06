@@ -22,9 +22,10 @@ from autentica.util.mixin import CMCLoginRequired, CMCAdminLoginRequired
 from cmcreport.lib.views import CMCReportView
 
 from votacao.votacao.api.autenticacao import CMCVereadorLoginRequired
-from votacao.votacao.forms import RelatorioVotacaoForm
+from votacao.votacao.forms import RelatorioVotacaoForm, FechaVotacoesForm
 from votacao.votacao.models import Votacao, Voto, Restricao
 from votacao.api.views import relatorio_votacao
+from votacao.cron.jobs import fecha_votacoes
 
 #--------------------------------------------------------------------------------------
 # Admin Index
@@ -74,3 +75,21 @@ class RelatorioVotacao(CMCReportView):
 			self.votacoes = relatorio_votacao(request, self.pac_id)
 
 		return super(RelatorioVotacao, self).get(request, *args, **kwargs)	
+
+#--------------------------------------------------------------------------------------
+# Fecha Votações Abertas Index
+#--------------------------------------------------------------------------------------    
+class FechaTodasAbertasIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
+    template_name = 'admin/fecha/index.html'                			
+
+#--------------------------------------------------------------------------------------
+# Fecha Votações Abertas
+#--------------------------------------------------------------------------------------    
+def fecha_abertas(request):
+	if request.method == 'POST':
+		form = FechaVotacoesForm(request, request.POST)
+		if form.is_valid():
+			fecha_votacoes()
+			return render(request, 'admin/fecha/sucesso.html')
+		else:
+			return render(request, 'admin/fecha/index.html')
