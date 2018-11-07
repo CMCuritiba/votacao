@@ -41,10 +41,13 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 		widget_json = {}
 		if (par_id != None):
 			try:
-				votacao = Votacao.objects.get(par_id=par_id)
-				votacao.status = 'A'
-				votacao.save()
-				logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
+				votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
+				if votacao.status == 'F':
+					votacao.status = 'A'
+					votacao.save()
+					logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
+				else:
+					logger.info("Tentativa de abrir projeto aberto ou já votado para projeto %s aberta por %s", codigo_projeto, request.user.username)
 			except Votacao.DoesNotExist:
 				votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
 				logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
@@ -106,10 +109,13 @@ def fecha_votacao(request, pac_id, par_id, codigo_projeto):
 	if request.method == 'POST':
 		widget_json = {}
 		if (par_id != None):
-			votacao = Votacao.objects.get(par_id=par_id)
-			votacao.status = 'V'
-			votacao.save()
-			logger.info("Votação para projeto %s encerrada por %s", codigo_projeto, request.user.username)
+			votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
+			if votacao.status == 'A':
+				votacao.status = 'V'
+				votacao.save()
+				logger.info("Votação para projeto %s encerrada por %s", codigo_projeto, request.user.username)
+			else:
+				logger.info("Tentativa fechar votação já encerrada para projeto %s encerrada por %s", codigo_projeto, request.user.username)
 			response = JsonResponse({'status':'true','message':'Projeto com votação encerrada'}, status=200)
 	return response	
 
