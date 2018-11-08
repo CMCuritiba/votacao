@@ -2,6 +2,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import environ, os
+import urllib3
+
+urllib3.disable_warnings()
 
 def gettext_noop(s):
     return s
