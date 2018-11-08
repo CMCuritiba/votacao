@@ -170,14 +170,23 @@ def vota(request, tipo_voto):
 		widget_json = {}
 		votacao = request.POST['votacao']
 		if (votacao != None):
-			try:
-				votacao = Votacao.objects.get(id=votacao)
-				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
-				logger.info("Voto %s por %s", tipo_voto, request.user.username)
-			except Votacao.DoesNotExist:
-				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
-				return response
-			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+			with transaction.atomic():
+				try:
+					votacao = Votacao.objects.get(id=votacao)
+					voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+					if voto.voto == 'V' and votacao.status == 'A':
+						logger.info("Pedido de vistas por %s", request.user.username)
+						Voto.objects.filter(votacao=votacao).exclude(voto='V').delete()
+						votacao.status = 'V'
+						votacao.save()
+						logger.info("Votação encerrada por pedido de vistas por %s", request.user.username)
+						logger.info("Voto %s por %s", tipo_voto, request.user.username)
+						response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+					else:
+						response = JsonResponse({'status':'true','message':'Votação encerrada antes', 'tipo_voto': tipo_voto}, status=404)
+				except Votacao.DoesNotExist:
+					response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+					return response
 	return response	
 
 # -----------------------------------------------------------------------------------

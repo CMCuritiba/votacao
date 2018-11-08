@@ -4,8 +4,13 @@ from django.urls import reverse
 from unittest.mock import patch, MagicMock, Mock
 import json
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.messages.middleware import MessageMiddleware
 
 from votacao.votacao.factories import VotacaoFactory
+from votacao.votacao.models import Votacao, Voto
+from votacao.api.views import vota
 
 class JSONVotacaoTest(TestCase):
 	def setup(self):
@@ -68,3 +73,36 @@ class JSONTextoConclusaoTest(TestCase):
 		response = self.client.get('/api/textos_conclusao/005.00087.2018/')
 		json = response.json()
 		self.assertEqual(json['pro_id'], 231127)
+
+class JSONVotaVistaTest(TestCase):
+	def setUp(self):
+		self.user = get_user_model().objects.create_user('zaquinha', password='zaca')
+		self.user.is_staff = True
+		self.user.lotado = 171
+		self.user.matricula = 2179
+		self.user.save()
+		self.votacao = Votacao.objects.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
+		self.voto = Voto.objects.create(votacao=self.votacao, vereador=self.user, voto='F')
+		self.factory = APIRequestFactory()
+		super(JSONVotaVistaTest, self).setUp()
+
+	def setup_request(self, request):
+		request.user = self.user
+
+		middleware = SessionMiddleware()
+		middleware.process_request(request)
+		request.session.save()
+
+		middleware = MessageMiddleware()
+		middleware.process_request(request)
+		request.session.save()
+	
+	def test_ok(self):
+		resp = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': 'V'}, status=200)
+
+		request = self.factory.post('/api/vota/A/', {'votacao': 1})
+
+		self.setup_request(request)
+		response = vota(request, 'V')
+		#votacao = VotacaoFactory.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
+		self.assertEqual(response.status_code, 200)
