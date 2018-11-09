@@ -173,8 +173,8 @@ def vota(request, tipo_voto):
 		if (votacao != None):
 			with transaction.atomic():
 				try:
+					votacao = Votacao.objects.get(id=votacao)
 					if votacao.status == 'A':
-						votacao = Votacao.objects.get(id=votacao)
 						voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
 						if voto.voto == 'V':
 							logger.info("Pedido de vistas por %s", request.user.username)
