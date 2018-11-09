@@ -9,18 +9,17 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.conf import settings
 
+from django.db import IntegrityError, transaction
+
 from votacao.votacao.forms import JSONVotacaoForm
 from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario
 from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert
+from votacao.api.util.db_util import verifica
 
 import json
 import requests
 
-import urllib3
-
 import jsonref
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from consumer.lib.views import SPLReuniaoComissaoView
 from consumer.lib.msconsumer import MSCMCConsumer
@@ -40,17 +39,19 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 
 		widget_json = {}
 		if (par_id != None):
-			try:
-				votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
-				if votacao.status == 'F':
-					votacao.status = 'A'
-					votacao.save()
-					logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
-				else:
-					logger.info("Tentativa de abrir projeto aberto ou já votado para projeto %s aberta por %s", codigo_projeto, request.user.username)
-			except Votacao.DoesNotExist:
-				votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
-				logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
+			with transaction.atomic():
+				if verifica('A'):
+					try:
+						votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
+						if votacao.status == 'F':
+							votacao.status = 'A'
+							votacao.save()
+							logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
+						else:
+							logger.info("Tentativa de abrir projeto aberto ou já votado para projeto %s aberta por %s", codigo_projeto, request.user.username)
+					except Votacao.DoesNotExist:
+						votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
+						logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
 			response = JsonResponse({'status':'true','message':'Projeto foi aberto para votação'}, status=200)
 	return response
 
@@ -60,8 +61,7 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 def verifica_abertos(request):
 	response = JsonResponse({'status':'false','message':'Já existe projeto para votação aberto'}, status=200)
 
-	abertas = Votacao.objects.filter(status='A')
-	if abertas.count() <= 0:
+	if verifica('A'):
 		response = JsonResponse({'status':'true','message':'Nenhum projeto aberto para votação'}, status=200)
 	return response
 
@@ -170,14 +170,24 @@ def vota(request, tipo_voto):
 		widget_json = {}
 		votacao = request.POST['votacao']
 		if (votacao != None):
-			try:
-				votacao = Votacao.objects.get(id=votacao)
-				voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
-				logger.info("Voto %s por %s", tipo_voto, request.user.username)
-			except Votacao.DoesNotExist:
-				response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
-				return response
-			response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+			with transaction.atomic():
+				try:
+					if votacao.status == 'A':
+						votacao = Votacao.objects.get(id=votacao)
+						voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+						if voto.voto == 'V':
+							logger.info("Pedido de vistas por %s", request.user.username)
+							Voto.objects.filter(votacao=votacao).exclude(voto='V').delete()
+							votacao.status = 'V'
+							votacao.save()
+							logger.info("Votação encerrada por pedido de vistas por %s", request.user.username)
+							logger.info("Voto %s por %s", tipo_voto, request.user.username)
+							response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+						else:
+							response = JsonResponse({'status':'true','message':'Votação encerrada antes', 'tipo_voto': tipo_voto}, status=404)
+				except Votacao.DoesNotExist:
+					response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+					return response
 	return response	
 
 # -----------------------------------------------------------------------------------
