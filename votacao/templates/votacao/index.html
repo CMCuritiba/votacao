@@ -276,7 +276,7 @@
                         $('#bt_contrario').attr("enabled","enabled");
                         toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
                         $.each(result, function(index, element) {
-                            toAppend += '<option value="' + element.txt_id + '">' + element.vereador + '</option>';
+                            toAppend += '<option value="' + element.txt_id + '">' + element.vereador + ' - ' + element.tcp_nome + '</option>';
                         });
                         toAppend += '</select>';
                         //console.log(toAppend);
