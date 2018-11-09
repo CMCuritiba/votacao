@@ -20,7 +20,7 @@ class Votacao(models.Model):
 		verbose_name_plural = 'Votações'
 
 	pac_id = models.IntegerField()
-	par_id = models.IntegerField(unique=True)
+	par_id = models.IntegerField()
 	codigo_proposicao = models.CharField(max_length=20)
 	status = models.CharField(max_length=1, default='F') # (A)berta, (F)echada, (V)otada
 
