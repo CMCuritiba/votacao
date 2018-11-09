@@ -86,7 +86,7 @@ def formata_projeto(projeto):
 	ejson = {}
 	try:
 		#votacao = Votacao.objects.get(par_id=projeto['par_id'])
-		votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
+		votacao = Votacao.objects.get(pac_id=projeto['pac_id'], par_id=projeto['par_id'], codigo_proposicao=projeto['codigo_proposicao'])
 		ejson['status'] = votacao.status
 	except Votacao.DoesNotExist:
 		ejson['status'] = 'F'
