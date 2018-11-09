@@ -85,7 +85,8 @@ def consome_projetos(request, pac_id):
 def formata_projeto(projeto):
 	ejson = {}
 	try:
-		votacao = Votacao.objects.get(par_id=projeto['par_id'])
+		#votacao = Votacao.objects.get(par_id=projeto['par_id'])
+		votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
 		ejson['status'] = votacao.status
 	except Votacao.DoesNotExist:
 		ejson['status'] = 'F'
