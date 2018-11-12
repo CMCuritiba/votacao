@@ -222,6 +222,9 @@
                             else if (full.status == 'F' && !algumAberto) {
                                 return "<a href='javascript:abreVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-success'>Abrir Votação</span></a>";
                             }
+                            else if (full.status == 'V' && !algumAberto) {
+                                return "<a href='javascript:reiniciaVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-default'>Reiniciar Votação</span></a>";
+                            }
                             else if (full.status == 'V') {
                                 return "<span id='abre' class='badge progress-bar-warning'>Projeto Votado</span>";
                             }
@@ -347,7 +350,29 @@
             })
         }
 
-        
+        function reiniciaVotacao(pac_id, par_id, codigo_proposicao) {
+            request_url = "/api/reinicia_votacao/";
+
+            $.ajax({
+                url: request_url,
+                xhrFields: {
+                    withCredentials: true
+                },
+                type: 'POST',
+                data: {csrfmiddlewaretoken: '{{csrf_token}}', pac_id: pac_id, par_id: par_id, codigo_proposicao: codigo_proposicao},
+                accepts: 'application/json',
+                dataType: 'json',
+                success: function(result){
+                    verifica_aberto();
+                    tableProjetos.ajax.reload(null, false);
+                },
+                error: function(xhr, status, error) {
+                    console.log(status);
+                    console.log(error);
+                    console.log(xhr);
+                }
+            })
+        }
 
     </script>
 

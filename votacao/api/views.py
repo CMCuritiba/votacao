@@ -311,3 +311,31 @@ def vota_contrario(request, tipo_voto, id_texto):
 				return response
 			response = JsonResponse({'status':'true','message':'Votação contrária efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
 	return response		
+# -----------------------------------------------------------------------------------
+# chamada API para reiniciar votacao
+# -----------------------------------------------------------------------------------
+def reinicia_votacao(request):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar reiniciar votacao.'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		pac_id = request.POST['pac_id']
+		par_id = request.POST['par_id']
+		codigo_proposicao = request.POST['codigo_proposicao']
+		if (pac_id != None and par_id != None and codigo_proposicao != None):
+			with transaction.atomic():
+				try:
+					votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_proposicao)
+					if votacao.status == 'F':
+						logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s reiniciada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+						Voto.objects.filter(votacao=votacao).delete()
+						votacao.status = 'A'
+						votacao.save()
+						response = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
+					else:
+						logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s tentativa de reiniciar votação não fechada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+				except Votacao.DoesNotExist:
+					logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s não encontrada para reiniciar por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+					response = JsonResponse({'status':'false','message':'Erro ao reiniciar votação.'}, status=404)
+					return response
+	return response		

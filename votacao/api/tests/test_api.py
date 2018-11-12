@@ -11,6 +11,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from votacao.votacao.factories import VotacaoFactory
 from votacao.votacao.models import Votacao, Voto
 from votacao.api.views import vota
+from votacao.api.views import reinicia_votacao
 
 class JSONVotacaoTest(TestCase):
 	def setup(self):
@@ -106,3 +107,65 @@ class JSONVotaVistaTest(TestCase):
 		response = vota(request, 'V')
 		#votacao = VotacaoFactory.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
 		self.assertEqual(response.status_code, 200)
+
+class JSONReiniciaVotacaoTest(TestCase):
+	def setUp(self):
+		self.user = get_user_model().objects.create_user('zaquinha', password='zaca')
+		self.user.is_staff = True
+		self.user.lotado = 171
+		self.user.matricula = 2179
+		self.user.save()
+		self.factory = APIRequestFactory()
+		super(JSONReiniciaVotacaoTest, self).setUp()
+
+	def setup_request(self, request):
+		request.user = self.user
+
+		middleware = SessionMiddleware()
+		middleware.process_request(request)
+		request.session.save()
+
+		middleware = MessageMiddleware()
+		middleware.process_request(request)
+		request.session.save()
+	
+	def test_ok(self):
+		self.votacao = Votacao.objects.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'F')
+		self.voto = Voto.objects.create(votacao=self.votacao, vereador=self.user, voto='F')
+
+		resp = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
+
+		request = self.factory.post('/api/reinicia/', {'pac_id': 667, 'par_id': 26393, 'codigo_proposicao': '023.00002.2018'})
+
+		self.setup_request(request)
+		response = reinicia_votacao(request)
+		#votacao = VotacaoFactory.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
+		self.assertEqual(response.status_code, 200)		
+		votacao = Votacao.objects.get(pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018')
+		self.assertEqual(votacao.status, 'A')		
+
+	def test_votacao_nao_fechada(self):
+		self.votacao = Votacao.objects.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
+		self.voto = Voto.objects.create(votacao=self.votacao, vereador=self.user, voto='F')
+		
+		resp = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
+
+		request = self.factory.post('/api/reinicia/', {'pac_id': 667, 'par_id': 26393, 'codigo_proposicao': '023.00002.2018'})
+
+		self.setup_request(request)
+		response = reinicia_votacao(request)
+		#votacao = VotacaoFactory.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
+		self.assertEqual(response.status_code, 404)				
+
+	def test_votacao_nao_encontrada(self):
+		self.votacao = Votacao.objects.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '021.00002.2018', status = 'A')
+		self.voto = Voto.objects.create(votacao=self.votacao, vereador=self.user, voto='F')
+		
+		resp = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
+
+		request = self.factory.post('/api/reinicia/', {'pac_id': 667, 'par_id': 26393, 'codigo_proposicao': '023.00002.2018'})
+
+		self.setup_request(request)
+		response = reinicia_votacao(request)
+		#votacao = VotacaoFactory.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
+		self.assertEqual(response.status_code, 404)						
