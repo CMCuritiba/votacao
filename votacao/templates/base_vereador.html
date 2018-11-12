@@ -34,6 +34,21 @@
 
     {% javascript 'master' %}
     
+        <script>
+            $(document).ready( function() {
+                $('.dropdown-toggle').dropdown();
+            });
+
+            $(".nav a").on("click", function(){
+                $(".nav").find(".active").removeClass("active");
+                $(this).parent().addClass("active");
+            });
+
+            $('li.active').removeClass('active');
+            $('a[href="' + location.pathname + '"]').closest('li').addClass('active'); 
+
+        </script>
+    
     {% block extra_javascript %}
 
     {% endblock %}
