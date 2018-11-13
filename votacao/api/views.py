@@ -182,10 +182,10 @@ def vota(request, tipo_voto):
 							votacao.status = 'V'
 							votacao.save()
 							logger.info("Votação encerrada por pedido de vistas por %s", request.user.username)
+							response = JsonResponse({'status':'true','message':'Pedido de vistas', 'tipo_voto': tipo_voto}, status=200)
+						else:
 							logger.info("Voto %s por %s", tipo_voto, request.user.username)
 							response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
-						else:
-							response = JsonResponse({'status':'true','message':'Votação encerrada antes', 'tipo_voto': tipo_voto}, status=404)
 				except Votacao.DoesNotExist:
 					response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
 					return response
@@ -310,4 +310,37 @@ def vota_contrario(request, tipo_voto, id_texto):
 				response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
 				return response
 			response = JsonResponse({'status':'true','message':'Votação contrária efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+	return response		
+# -----------------------------------------------------------------------------------
+# chamada API para reiniciar votacao
+# -----------------------------------------------------------------------------------
+def reinicia_votacao(request):
+	response = JsonResponse({'status':'false','message':'Erro ao tentar reiniciar votacao.'}, status=404)
+
+	if request.method == 'POST':
+		widget_json = {}
+		pac_id = request.POST['pac_id']
+		par_id = request.POST['par_id']
+		codigo_proposicao = request.POST['codigo_proposicao']
+		if (pac_id != None and par_id != None and codigo_proposicao != None):
+			with transaction.atomic():
+				try:
+					votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_proposicao)
+					if votacao.status == 'V':
+						logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s reiniciada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+						
+						votos = votacao.voto_set.all()
+						for voto in votos:
+							voto.votocontrario_set.all().delete()
+							voto.restricao_set.all().delete()
+						votos.delete()
+						votacao.status = 'A'
+						votacao.save()
+						response = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
+					else:
+						logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s tentativa de reiniciar votação não fechada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+				except Votacao.DoesNotExist:
+					logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s não encontrada para reiniciar por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+					response = JsonResponse({'status':'false','message':'Erro ao reiniciar votação.'}, status=404)
+					return response
 	return response		
