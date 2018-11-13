@@ -27,6 +27,25 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="reiniciaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+          </div>
+          <div class="modal-body">
+            <h2><b>Reinicia Votação</b></h2>
+            <h3>Esta operação irá apagar todos os votos desta votação</h3>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-lg" data-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary btn-lg" id="confirmaReinicia">Confirma</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 {% endblock %}    
 
 {% block extra_javascript %}
@@ -36,6 +55,9 @@
         var tableReunioes;
         var tableProjetos;
         var algumAberto=false;
+        var reinicia_pac_id;
+        var reinicia_par_id;
+        var reinicia_codigo_proposicao;
 
 
         function verifica_aberto() {
@@ -63,6 +85,31 @@
         }
 
         $(document).ready(function() {
+
+            $("button#confirmaReinicia").click(function() {
+                request_url = "/api/reinicia_votacao/";
+
+                $.ajax({
+                    url: request_url,
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    type: 'POST',
+                    data: {csrfmiddlewaretoken: '{{csrf_token}}', pac_id: reinicia_pac_id, par_id: reinicia_par_id, codigo_proposicao: reinicia_codigo_proposicao},
+                    accepts: 'application/json',
+                    dataType: 'json',
+                    success: function(result){
+                        verifica_aberto();
+                        tableProjetos.ajax.reload(null, false);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(status);
+                        console.log(error);
+                        console.log(xhr);
+                    }
+                })
+                $("#reiniciaModal").modal('hide');
+            });
 
             
             $.fn.dataTable.ext.errMode = 'none';
@@ -353,25 +400,10 @@
         function reiniciaVotacao(pac_id, par_id, codigo_proposicao) {
             request_url = "/api/reinicia_votacao/";
 
-            $.ajax({
-                url: request_url,
-                xhrFields: {
-                    withCredentials: true
-                },
-                type: 'POST',
-                data: {csrfmiddlewaretoken: '{{csrf_token}}', pac_id: pac_id, par_id: par_id, codigo_proposicao: codigo_proposicao},
-                accepts: 'application/json',
-                dataType: 'json',
-                success: function(result){
-                    verifica_aberto();
-                    tableProjetos.ajax.reload(null, false);
-                },
-                error: function(xhr, status, error) {
-                    console.log(status);
-                    console.log(error);
-                    console.log(xhr);
-                }
-            })
+            reinicia_pac_id = pac_id;
+            reinicia_par_id = par_id;
+            reinicia_codigo_proposicao = codigo_proposicao;
+            $("#reiniciaModal").modal();
         }
 
     </script>

@@ -99,8 +99,6 @@ class JSONVotaVistaTest(TestCase):
 		request.session.save()
 	
 	def test_ok(self):
-		resp = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': 'V'}, status=200)
-
 		request = self.factory.post('/api/vota/A/', {'votacao': 1})
 
 		self.setup_request(request)
@@ -130,7 +128,7 @@ class JSONReiniciaVotacaoTest(TestCase):
 		request.session.save()
 	
 	def test_ok(self):
-		self.votacao = Votacao.objects.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'F')
+		self.votacao = Votacao.objects.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'V')
 		self.voto = Voto.objects.create(votacao=self.votacao, vereador=self.user, voto='F')
 
 		resp = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
