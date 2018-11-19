@@ -39,19 +39,19 @@ def abre_votacao(request, pac_id, par_id, codigo_projeto):
 
 		widget_json = {}
 		if (par_id != None):
-			with transaction.atomic():
-				if verifica('A'):
-					try:
-						votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
-						if votacao.status == 'F':
-							votacao.status = 'A'
-							votacao.save()
-							logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
-						else:
-							logger.info("Tentativa de abrir projeto aberto ou já votado para projeto %s aberta por %s", codigo_projeto, request.user.username)
-					except Votacao.DoesNotExist:
-						votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
+			#with transaction.atomic():
+			if verifica('A'):
+				try:
+					votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
+					if votacao.status == 'F':
+						votacao.status = 'A'
+						votacao.save()
 						logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
+					else:
+						logger.info("Tentativa de abrir projeto aberto ou já votado para projeto %s aberta por %s", codigo_projeto, request.user.username)
+				except Votacao.DoesNotExist:
+					votacao = Votacao.objects.create(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto, status='A')
+					logger.info("Votação para projeto %s aberta por %s", codigo_projeto, request.user.username)
 			response = JsonResponse({'status':'true','message':'Projeto foi aberto para votação'}, status=200)
 	return response
 
