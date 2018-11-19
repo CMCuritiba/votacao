@@ -90,3 +90,6 @@ coverage==4.5.1
 
 # Tarefas agendadas
 django-crontab==0.7.1
+
+# Compressor
+django-compressor==2.1.1

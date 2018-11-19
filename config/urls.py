@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 import votacao.votacao.views as viewsadmin
 
 urlpatterns = [
@@ -28,6 +29,9 @@ if settings.DEBUG:
         re_path(r'^404/$', default_views.page_not_found, kwargs={'exception': Exception('Page not Found')}),
         re_path(r'^500/$', default_views.server_error),
     ]
+
+    urlpatterns += staticfiles_urlpatterns()
+
     if 'debug_toolbar' in settings.INSTALLED_APPS:
         import debug_toolbar
 
