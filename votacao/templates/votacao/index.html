@@ -6,7 +6,7 @@
 {% block content %}
 
 
-<div class="panel panel-primary">
+<div id="pnl_projeto" class="panel panel-primary">
     <input type="hidden" name="numero_projeto" id="numero_projeto"/>
     <input type="hidden" name="votacao" id="votacao"/>
     <input type="hidden" name="tipo_voto" id="tipo_voto"/>
@@ -160,8 +160,10 @@
                         carregaCampos(result);
                         montaBotoes(result[0].votado, result[0].tipo_voto);
                         verifica_contrario(result[0].codigo_proposicao);
+                        $('#pnl_projeto').show();
                     }
                     else {
+                        $('#pnl_projeto').hide();
                         limpaCampos();
                         $('#botoes').empty();
                         $('#botoes').append('<h1>Aguardando liberação para votação</h1>');
