@@ -18,10 +18,12 @@ from autentica.models import User as Usuario
 class Votacao(models.Model):
 	class Meta:
 		verbose_name_plural = 'Votações'
+		unique_together = ('pac_id', 'par_id', 'codigo_proposicao')
 
 	pac_id = models.IntegerField()
 	par_id = models.IntegerField()
 	codigo_proposicao = models.CharField(max_length=20)
+
 	status = models.CharField(max_length=1, default='F') # (A)berta, (F)echada, (V)otada
 
 	def lista_votos(self):

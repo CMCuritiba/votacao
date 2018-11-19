@@ -382,6 +382,7 @@ PIPELINE = {
               'datatables-datetime-moment/dist/js/datetime-moment.min.js',
               'axios/dist/axios.min.js',
               'vue/dist/vue.min.js',
+              'build.js',
               #'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
               #'fullcalendar/dist/fullcalendar.min.js',
               #'fullcalendar/dist/gcal.min.js',
