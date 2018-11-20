@@ -310,8 +310,9 @@ def atualiza():
 	with cd(PROJECT_ROOT):
 		with source_virtualenv():
 			# Roda o bower install
-			sudo('pip install django-nose')
-			sudo('pip install django-crontab')
+			#sudo('pip install django-nose')
+			#sudo('pip install django-crontab')
+			sudo('pip install django-compressor==2.1.1')
 			#run('python manage.py makemigrations votacao --settings=config.settings.production')
 			#run('./manage.py makemigrations autentica --settings=config.settings.production')
 			#run('./manage.py makemigrations cadastro --settings=config.settings.production')
