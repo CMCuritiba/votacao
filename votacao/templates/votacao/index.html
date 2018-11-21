@@ -11,21 +11,21 @@
     <input type="hidden" name="votacao" id="votacao"/>
     <input type="hidden" name="tipo_voto" id="tipo_voto"/>
     <input type="hidden" name="id_texto" id="id_texto"/>
-    <div id="projeto" class="panel-heading">Tela de votação de projetos</div>
+    <div id="projeto" class="panel-heading"></div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-12">
-                    <h2 id="iniciativa"></h2>
+                    <h3 id="iniciativa"></h3>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <h3 id="ementa"></h3>
+                    <h4 id="ementa"></h4>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <h3 id="conclusao"></h3>
+                    <h4 id="conclusao"></h4>
                 </div>
             </div>
         </div>
@@ -185,7 +185,7 @@
         function carregaCampos(result) {
             $('#numero_projeto').val(result[0].codigo_proposicao);
             $('#votacao').val(result[0].id);
-            $('#projeto').append('<h1>' + result[0].codigo_proposicao + '</h1>');
+            $('#projeto').append('<h3>' + result[0].codigo_proposicao + '</h3>');
             $('#iniciativa').append('Iniciativa: ' + result[0].iniciativa);
             $('#ementa').append(result[0].sumula);
             $('#conclusao').append('Conclusão: ' + result[0].conclusao_relator);
