@@ -8,3 +8,9 @@
     margin-left: 10px;
     margin-right: 10px;
 }
+
+.alert-abstencao {
+  color: #737373;
+  background-color: #d9d9d9;
+  border-color: #e6e6e6;
+}

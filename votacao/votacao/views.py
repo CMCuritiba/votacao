@@ -98,3 +98,9 @@ def fecha_abertas(request):
 			return render(request, 'admin/fecha/sucesso.html')
 		else:
 			return render(request, 'admin/fecha/index.html')
+
+#--------------------------------------------------------------------------------------
+# Painel Votacao Index
+#--------------------------------------------------------------------------------------    
+class PainelIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
+    template_name = 'admin/painel/index.html'

@@ -1,0 +1,126 @@
+{% extends "base_admin.html" %}
+
+{% block title %}<% comissao %>{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+	<div class="panel-body">
+		<section v-if="errored">
+			<p>Erro ao carregar informações da votação</p>
+		</section>
+		<section v-else>
+			<div class="row">
+				<div class="col-sm-8"><h4>Proposição</h4></div>
+				<div class="col-sm-4" align="right"><h4><% codigo_proposicao %></h4></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-8"><h4>Ementa</h4></div>
+				<div class="col-sm-4" align="right"><h4></h4></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-8"><h4>Iniciativa</h4></div>
+				<div class="col-sm-4" align="right"><h4><% iniciativa %></h4></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-8"><h4>Conclusão do Relator</h4></div>
+				<div class="col-sm-4" align="right"><h4><% conclusao %></h4></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12" align="center"><h3>Resultado da Votação</h3></div>
+			</div>
+			<div v-if="carregando">Carregando informações da votação...</div>
+			<div 
+				v-else
+				v-for="voto in votos">
+				<div :class="classeVoto(voto.voto)">
+					<div class="col-sm-8" v-html="voto.vereador"></div>
+					<div class="col-sm-4" align="right"><% voto.voto | votoExtenso %></div>
+				</div>
+			</div>
+		</section>
+	</div>
+</div>
+
+{% endblock content %}
+
+
+{% block extra_javascript %}
+
+<script type="text/javascript">
+
+	var app = new Vue({
+		el: '#app',
+		delimiters: ["<%","%>"],
+		data() {
+			return {
+				carregando: true,
+				errored: false,
+				status_votacao: null,
+				codigo_proposicao: null,
+				sumula: null,
+				votos: null,
+				totais: null,
+				info: null,
+				comissao: null,
+				iniciativa: null,
+				conclusao: null,
+			}
+		},
+		filters: {
+    		votoExtenso (voto) {
+      			if (voto === 'F')
+      				return "FAVORÁVEL";
+      			else if (voto === 'R')
+      				return "FAVORÁVEL COM RESTRIÇÕES";
+      			else if (voto === 'C')
+      				return "CONTRÁRIO";
+      			else if (voto === 'A')
+      				return "ABSTENÇÃO";
+      			else if (voto === 'V')
+      				return "VISTAS";
+      			else
+      				return "";
+    		},
+  		},
+  		methods: {
+  			classeVoto (voto){
+    			if (voto == 'F')
+    				return "row alert alert-success";
+    			else if (voto == 'R')
+    				return "row alert alert-warning";
+    			else if (voto == 'C')
+    				return "row alert alert-danger";
+    			else if (voto == 'A')
+    				return "row alert alert-abstencao";
+    			else if (voto == 'V')
+    				return "row alert alert-info";
+    			else
+    				return "row";
+    		}
+  		},
+		mounted() {
+			axios
+				.get('/api/monta_painel/724/26831/001.00001.2018/')
+				.then(response => (
+					this.status_votacao = response.data.status,
+					this.codigo_proposicao = response.data.codigo_proposicao,
+					this.sumula = response.data.sumula,
+					this.votos = response.data.VotoJSONs,
+					this.totais = response.data.TotalJSONs,
+					this.comissao = response.data.comissao,
+					this.info = response.data,
+					this.iniciativa = response.data.iniciativa,
+					this.conclusao = response.data.conclusao
+				))
+				.catch(error => {
+					console.log(error),
+					this.errored = true
+				})
+				.finally(() => this.carregando = false)
+		}
+	})
+
+</script>
+
+{% endblock %}

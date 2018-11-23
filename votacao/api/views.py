@@ -13,7 +13,7 @@ from django.db import IntegrityError, transaction
 
 from votacao.votacao.forms import JSONVotacaoForm
 from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario
-from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert
+from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert, PainelVotacaoJSON
 from votacao.api.util.db_util import verifica
 
 import json
@@ -344,3 +344,64 @@ def reinicia_votacao(request):
 					response = JsonResponse({'status':'false','message':'Erro ao reiniciar votação.'}, status=404)
 					return response
 	return response		
+
+# -----------------------------------------------------------------------------------
+# chamada API para retornar status do projeto
+# -----------------------------------------------------------------------------------
+def monta_painel(request, pac_id, par_id, codigo_projeto):
+	consumer = MSCMCConsumer()
+
+	array_json=[]
+	if (pac_id != None and par_id != None and codigo_projeto != None):
+		tot_favoravel = 0
+		tot_favoravel_restricoes = 0
+		tot_contrario = 0
+		tot_abstencao = 0
+		tot_vista = 0
+		try:
+			rec_id = consumer.consome_rec_id(request, pac_id)
+			reuniao = consumer.consome_reuniao(request, rec_id)
+			con_id = reuniao['con_id']
+			rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
+			rec_data = reuniao['rec_data']
+			rec_numero = reuniao['rec_numero']
+			comissao = consumer.consome_comissao(request, con_id)
+			ini_nome = comissao['ini_nome']
+
+			search_url = '{}/api/spl/projeto/{}/{}/{}/'.format(settings.MSCMC_SERVER, pac_id, par_id, codigo_projeto)
+			r = requests.get(search_url, verify=False)
+			projeto = r.json()
+			codigo_proposicao = projeto[0]['codigo_proposicao']
+			iniciativa = projeto[0]['iniciativa']
+			sumula = projeto[0]['sumula']
+			relator = projeto[0]['relator']
+			conclusao = projeto[0]['conclusao_comissao']
+
+			votacao_banco = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
+
+			votacao = PainelVotacaoJSON(codigo_proposicao, relator, iniciativa, sumula, conclusao, votacao_banco.status, ini_nome)
+
+			for voto in votacao_banco.lista_votos():
+				if voto.voto == 'F':
+					tot_favoravel += 1
+				elif voto.voto == 'C':
+					tot_contrario += 1
+				elif voto.voto == 'R':
+					tot_favoravel_restricoes += 1
+				elif voto.voto == 'A':
+					tot_abstencao += 1
+				elif voto.voto == 'V':
+					tot_vista += 1
+				votacao.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto))
+			votacao.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
+			asJson = JsonConvert.ToJSON(votacao)
+			fromJson = JsonConvert.FromJSON(asJson)
+			asJsonFromJson = JsonConvert.ToJSON(fromJson)
+			data = jsonref.loads(asJson)
+			return JsonResponse(data, safe=False)			
+		except Votacao.DoesNotExist:
+			asJson = JsonConvert.ToJSON(votacao)
+			fromJson = JsonConvert.FromJSON(asJson)
+			asJsonFromJson = JsonConvert.ToJSON(fromJson)
+			data = jsonref.loads(asJson)
+			return JsonResponse(data, safe=False)			
