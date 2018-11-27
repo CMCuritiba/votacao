@@ -1,33 +1,33 @@
-{% extends "base_admin.html" %}
+{% extends "base_painel.html" %}
 
 {% block title %}<% comissao %>{% endblock %}
 
 {% block content %}
 
 <div class="panel">
-	<div class="panel-body">
+	<div class="panel-body painel-votacao">
 		<section v-if="errored">
 			<p>Erro ao carregar informações da votação</p>
 		</section>
 		<section v-else>
 			<div class="row">
-				<div class="col-sm-8"><h4>Proposição</h4></div>
+				<div class="col-sm-8"><h4>Proposição :</h4></div>
 				<div class="col-sm-4" align="right"><h4><% codigo_proposicao %></h4></div>
 			</div>
 			<div class="row">
-				<div class="col-sm-8"><h4>Ementa</h4></div>
-				<div class="col-sm-4" align="right"><h4></h4></div>
+				<div class="col-sm-2"><h4>Ementa :</h4></div>
+				<div class="col-sm-10" align="right"><h4><% sumula %></h4></div>
 			</div>
 			<div class="row">
-				<div class="col-sm-8"><h4>Iniciativa</h4></div>
+				<div class="col-sm-8"><h4>Iniciativa :</h4></div>
 				<div class="col-sm-4" align="right"><h4><% iniciativa %></h4></div>
 			</div>
 			<div class="row">
-				<div class="col-sm-8"><h4>Conclusão do Relator</h4></div>
+				<div class="col-sm-8"><h4>Conclusão do Relator :</h4></div>
 				<div class="col-sm-4" align="right"><h4><% conclusao %></h4></div>
 			</div>
-			<div class="row">
-				<div class="col-sm-12" align="center"><h3>Resultado da Votação</h3></div>
+			<div class="row" v-if="mostra">
+				<div class="col-sm-12" align="center"><h3>Voto dos vereadores</h3></div>
 			</div>
 			<div v-if="carregando">Carregando informações da votação...</div>
 			<div 
@@ -38,8 +38,20 @@
 					<div class="col-sm-4" align="right"><% voto.voto | votoExtenso %></div>
 				</div>
 			</div>
+			<div class="row" v-if="mostra">
+				<div class="col-sm-12" align="center">
+					<button type="button" class="btn btn-success btn-lg">Favorável  <span class="badge"><% total_favoravel %></span></button>
+					<button type="button" class="btn btn-danger btn-lg">Contrário  <span class="badge"><% total_contrario %></span></button>
+					<button type="button" class="btn btn-warning btn-lg">Favorável com restrições  <span class="badge"><% total_favoravel_restricoes %></span></button>
+					<button type="button" class="btn btn-default btn-lg">Abstenção  <span class="badge"><% total_abstencao %></span></button>
+					<button type="button" class="btn btn-info btn-lg">Vistas  <span class="badge"><% total_vistas %></span></button>
+				</div>
+			</div>
 		</section>
 	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12" align="center"><h4><% status_votacao | votacaoStatus %></h4></div>
 </div>
 
 {% endblock content %}
@@ -61,10 +73,16 @@
 				sumula: null,
 				votos: null,
 				totais: null,
+				total_favoravel: null,
+				total_favoravel_restricoes: null,
+				total_contrario: null,
+				total_abstencao: null,
+				total_vistas: null,
 				info: null,
 				comissao: null,
 				iniciativa: null,
 				conclusao: null,
+				mostra: false,
 			}
 		},
 		filters: {
@@ -82,26 +100,43 @@
       			else
       				return "";
     		},
+    		votacaoStatus(status) {
+    			if (status === 'F')
+    				return 'Aguardando início da votação';
+    			else if (status === 'V')
+    				return 'Votação encerrada';
+    			else if (status === 'A')
+    				return 'Votação em andamento';
+    		},
+
   		},
   		methods: {
   			classeVoto (voto){
     			if (voto == 'F')
-    				return "row alert alert-success";
+    				return "row voto alert-success";
     			else if (voto == 'R')
-    				return "row alert alert-warning";
+    				return "row voto alert-warning";
     			else if (voto == 'C')
-    				return "row alert alert-danger";
+    				return "row voto alert-danger";
     			else if (voto == 'A')
-    				return "row alert alert-abstencao";
+    				return "row voto-abstencao";
     			else if (voto == 'V')
-    				return "row alert alert-info";
+    				return "row voto alert-info";
     			else
     				return "row";
-    		}
-  		},
-		mounted() {
-			axios
-				.get('/api/monta_painel/724/26831/001.00001.2018/')
+    		},
+    		formataTotais() {
+    			if (this.totais === null) {
+    				this.total_favoravel = '0';
+    				this.total_favoravel_restricoes = '0';
+					this.total_contrario = '0';
+					this.total_abstencao = '0';
+					this.total_vistas = '0';
+    			}
+    		},
+    		carregaDados() {
+    			axios
+				.get('/api/monta_painel/{{ pac_id }}/{{ par_id }}/{{ codigo_projeto }}/')
 				.then(response => (
 					this.status_votacao = response.data.status,
 					this.codigo_proposicao = response.data.codigo_proposicao,
@@ -118,6 +153,19 @@
 					this.errored = true
 				})
 				.finally(() => this.carregando = false)
+				this.formataTotais();
+				if (this.votos == null || this.votos == '') {
+					this.mostra = false;
+				}
+				else {
+					this.mostra = true;
+				}
+    		},
+    		
+  		},
+		mounted() {
+			this.carregaDados();
+			this.timer = setInterval(this.carregaDados, 10000)
 		}
 	})
 

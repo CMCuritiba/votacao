@@ -59,48 +59,62 @@ class RelatorioVotacaoIndex(CMCAdminLoginRequired, SuccessMessageMixin, Template
 # Relatorio Votacao impressao
 #--------------------------------------------------------------------------------------        
 class RelatorioVotacao(CMCReportView):
-	template_name = 'admin/relatorio/votacao/relatorio.html'
-	download_filename = 'relatorio_votacao.pdf'
-	pac_id = None
-	votacoes = []
+    template_name = 'admin/relatorio/votacao/relatorio.html'
+    download_filename = 'relatorio_votacao.pdf'
+    pac_id = None
+    votacoes = []
 
-	def get_context_data(self, **kwargs):
-		context = super(CMCReportView, self).get_context_data(**kwargs)
-		context['title'] = 'Relatório de Votação'
-		context['pagesize'] = 'A4 portrait'
-		context['votacoes'] = self.votacoes
-		return context
+    def get_context_data(self, **kwargs):
+        context = super(CMCReportView, self).get_context_data(**kwargs)
+        context['title'] = 'Relatório de Votação'
+        context['pagesize'] = 'A4 portrait'
+        context['votacoes'] = self.votacoes
+        return context
 
-	def post(self, request, *args, **kwargs):
-		context = super(CMCReportView, self).get_context_data(**kwargs)
-		form = RelatorioVotacaoForm(data = request.POST)
-		if form.is_valid():
-			self.pac_id = form['pac_id'].value()
-			self.votacoes = relatorio_votacao(request, self.pac_id)
+    def post(self, request, *args, **kwargs):
+        context = super(CMCReportView, self).get_context_data(**kwargs)
+        form = RelatorioVotacaoForm(data = request.POST)
+        if form.is_valid():
+            self.pac_id = form['pac_id'].value()
+            self.votacoes = relatorio_votacao(request, self.pac_id)
 
-		return super(RelatorioVotacao, self).get(request, *args, **kwargs)	
+        return super(RelatorioVotacao, self).get(request, *args, **kwargs)  
 
 #--------------------------------------------------------------------------------------
 # Fecha Votações Abertas Index
 #--------------------------------------------------------------------------------------    
 class FechaTodasAbertasIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
-    template_name = 'admin/fecha/index.html'                			
+    template_name = 'admin/fecha/index.html'                            
 
 #--------------------------------------------------------------------------------------
 # Fecha Votações Abertas
 #--------------------------------------------------------------------------------------    
 def fecha_abertas(request):
-	logger.info("Fechamento forçado de votações abertas feito por %s", request.user.username)
-	if request.method == 'POST':
-		form = FechaVotacoesForm(request, request.POST)
-		if form.is_valid():
-			fecha_votacoes()
-			return render(request, 'admin/fecha/sucesso.html')
-		else:
-			return render(request, 'admin/fecha/index.html')
+    logger.info("Fechamento forçado de votações abertas feito por %s", request.user.username)
+    if request.method == 'POST':
+        form = FechaVotacoesForm(request, request.POST)
+        if form.is_valid():
+            fecha_votacoes()
+            return render(request, 'admin/fecha/sucesso.html')
+        else:
+            return render(request, 'admin/fecha/index.html')
 
 #--------------------------------------------------------------------------------------
 # Painel Votacao Index
 #--------------------------------------------------------------------------------------    
 class PainelIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
     template_name = 'admin/painel/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PainelIndex, self).get_context_data(**kwargs)
+        context['pac_id'] = self.pac_id
+        context['par_id'] = self.par_id
+        context['codigo_projeto'] = self.codigo_projeto
+        return context
+
+    def get(self, request, *args, **kwargs):
+        context = super(PainelIndex, self).get_context_data(**kwargs)
+        self.pac_id = request.GET['pac_id']
+        self.par_id = request.GET['par_id']
+        self.codigo_projeto = request.GET['codigo_projeto']
+        return super(PainelIndex, self).get(request, *args, **kwargs)   
