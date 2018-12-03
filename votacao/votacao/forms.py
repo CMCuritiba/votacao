@@ -18,6 +18,8 @@ from django.contrib.sessions.backends.db import SessionStore
 
 from votacao.votacao.models import Votacao
 
+from autentica.models import User as Usuario
+
 #------------------------------------------------------------------------------------------
 # classe form utilizada para validar JSON de alteração de status dos locais
 #------------------------------------------------------------------------------------------
@@ -92,3 +94,41 @@ class FechaVotacoesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(FechaVotacoesForm, self).__init__(*args, **kwargs)
         
+#------------------------------------------------------------------------------------------
+# classe form utilizada alterar permissões de usuários
+#------------------------------------------------------------------------------------------
+class UsuarioPermissaoForm(forms.ModelForm):
+
+    class Meta:
+        model = Usuario
+        fields = ['username','is_superuser', 'is_active', 'is_staff']
+
+    def __init__(self, *args, **kwargs):
+        super(UsuarioPermissaoForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.fields['username'].widget.attrs['readonly'] = True
+        
+        username = forms.CharField()
+        is_staff = forms.BooleanField()
+        is_superuser = forms.BooleanField()
+        is_active = forms.BooleanField()
+
+        self.helper.layout = Layout(
+            Div(
+                Div('username', css_class='col-md-12',),
+                css_class='col-md-12 row',
+            ),
+            Div(
+                Div('is_staff', css_class='col-md-12',),
+                css_class='col-md-12 row',
+            ),
+            Div(
+                Div('is_superuser', css_class='col-md-12',),
+                css_class='col-md-12 row',
+            ),
+            Div(
+                Div('is_active', css_class='col-md-12',),
+                css_class='col-md-12 row',
+            ),
+            
+        )  

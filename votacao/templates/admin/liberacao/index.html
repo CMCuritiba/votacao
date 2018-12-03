@@ -1,7 +1,7 @@
 {% extends "base_admin.html" %}
 {% load crispy_forms_tags %}
 
-{% block title %}Liberação de Votação{% endblock %}
+{% block title %}Reuniões do Dia{% endblock %}
 
 {% block content %}
 
@@ -262,6 +262,8 @@
                     {
                         "targets": [5],
                         "data": null,
+                        "orderable": false,
+                        "visible": true,
                         "render" : function(data, type, full, meta) {
                             if (full.status == 'A') {
                                 return "<a href='javascript:fechaVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='abre' class='badge progress-bar-danger'>Fechar Votação</span></a>";
@@ -279,6 +281,22 @@
                                 return "";
                             }
                         },
+                        "className": "dt-center"
+                    },
+                    {
+                        "targets": [6],
+                        "data": null,
+                        "orderable": false,
+                        "visible": true,
+                        "render" : function(data, type, full, meta) {
+                            return ""
+                        },
+
+                        /*
+                        "render" : function(data, type, full, meta) {
+                            return "<a href='javascript:painelVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='painel' class='badge  progress-bar-default'>Painel</span></a>";
+                        },
+                        */
                         "className": "dt-center"
                     },
                 ],
@@ -375,7 +393,7 @@
 
         function fechaVotacao(pac_id, par_id, codigo_proposicao) {
             request_url = "/api/fecha_votacao/" + pac_id + "/" + par_id + "/" + codigo_proposicao + "/";
-
+            
             $.ajax({
                 url: request_url,
                 xhrFields: {
@@ -404,6 +422,41 @@
             reinicia_par_id = par_id;
             reinicia_codigo_proposicao = codigo_proposicao;
             $("#reiniciaModal").modal();
+        }
+
+        function painelVotacao(ppac_id, ppar_id, pcodigo_proposicao) {
+            var form = document.createElement("form");
+            form.setAttribute("name", "formPainel");
+            form.setAttribute("method", "get");
+            form.setAttribute("action", "/admin/painel/");
+            form.setAttribute("target", "janelaVotacao");
+
+            var csrf = document.createElement("input");
+            csrf.setAttribute("type", "hidden");
+            csrf.setAttribute("name", "csrfmiddlewaretoken");
+            csrf.setAttribute("value", "{{ csrf_token }}");
+            form.appendChild(csrf);
+
+            var pac_id = document.createElement("input");
+            pac_id.setAttribute("type", "hidden");
+            pac_id.setAttribute("name", "pac_id");
+            pac_id.setAttribute("value", ppac_id);
+            form.appendChild(pac_id);
+
+            var par_id = document.createElement("input");
+            par_id.setAttribute("type", "hidden");
+            par_id.setAttribute("name", "par_id");
+            par_id.setAttribute("value", ppar_id);
+            form.appendChild(par_id);
+
+            var codigo_proposicao = document.createElement("input");
+            codigo_proposicao.setAttribute("type", "hidden");
+            codigo_proposicao.setAttribute("name", "codigo_projeto");
+            codigo_proposicao.setAttribute("value", pcodigo_proposicao);
+            form.appendChild(codigo_proposicao);
+
+            document.body.appendChild(form);
+            form.submit();
         }
 
     </script>

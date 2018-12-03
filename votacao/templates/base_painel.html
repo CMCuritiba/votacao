@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        {% load pipeline %}
+        {% load static %}
+
+        {% stylesheet 'master' %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
+    <body>
+
+    {% javascript 'master' %}
+
+    <div class="page-header">
+        <img src="{% static "images/brasao_transparente.png" %}" width="70px" class="c-brasao"/>
+        <h1 style="margin-top:-10px;">Sistema de Votação - Painel</h1>
+    </div>
+    <div id="app">
+        <div class="container">
+            
+            <div class="starter-template">
+
+                {% block content %}{% endblock content %}
+
+            </div>
+        </div>
+    </div>
+    
+    {% block extra_javascript %}
+
+    {% endblock %}
+  </body>
+</html>
+

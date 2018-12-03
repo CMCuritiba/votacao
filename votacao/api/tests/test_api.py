@@ -9,6 +9,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.messages.middleware import MessageMiddleware
 
 from votacao.votacao.factories import VotacaoFactory
+from votacao.votacao.factories import VereadorFactory
 from votacao.votacao.models import Votacao, Voto
 from votacao.api.views import vota
 from votacao.api.views import reinicia_votacao
@@ -167,3 +168,14 @@ class JSONReiniciaVotacaoTest(TestCase):
 		response = reinicia_votacao(request)
 		#votacao = VotacaoFactory.create(id=1, pac_id = 667, par_id = 26393, codigo_proposicao = '023.00002.2018', status = 'A')
 		self.assertEqual(response.status_code, 404)						
+
+class JSONUsuarioTest(TestCase):
+	def setup(self):
+		self.factory = APIRequestFactory()
+		super(JSONUsuarioTest, self).setUp()
+
+	def test_url(self):
+		vereador = VereadorFactory.create()	
+		response = self.client.get('/api/usuarios/')
+
+		self.assertEqual(response.status_code, 200)

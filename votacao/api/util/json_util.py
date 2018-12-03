@@ -83,6 +83,20 @@ class ReuniaoJSON(object):
         self.rec_data = rec_data
         self.VotacaoJSONs = [] if VotacaoJSONs is None else VotacaoJSONs
 
+
+@JsonConvert.register
+class PainelVotacaoJSON(object):
+    def __init__(self, codigo_proposicao:str=None, relator:str=None, iniciativa:str=None, sumula:str=None, conclusao:str=None, status: str=None, comissao:str=None, VotoJSONs:[VotoJSON]=None, TotalJSONs:[TotalJSON]=None):
+        self.codigo_proposicao = codigo_proposicao
+        self.relator = relator
+        self.iniciativa = iniciativa
+        self.sumula = sumula
+        self.conclusao = conclusao
+        self.status = status
+        self.comissao = comissao
+        self.VotoJSONs = [] if VotoJSONs is None else VotoJSONs
+        self.TotalJSONs = [] if TotalJSONs is None else TotalJSONs
+        return        
 '''
 def montaJSONVotacao(voto, rec_id, con_id, rec_tipo_reuniao, rec_numero, ini_nome):
     linha_json = {}

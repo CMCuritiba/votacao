@@ -7,7 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
  </head>
  <body>
-  
+
+  {% javascript 'master' %}
+
   <div id="app">
       <div class="container">
           <cabecalho titulo="Sistema de Votação"></cabecalho>
@@ -36,6 +38,7 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Utilitários<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     <li><a href="/admin/fecha/abertas/">Fecha Votações Abertas</a></li>
+                                    <li><a href="/admin/gerencia/usuario/">Permissões de Usuários</a></li>
                                 </ul>
                             </li>
                             <li><a href="/autentica/sair/">Sair</a></li>
@@ -65,7 +68,6 @@
           </div>
         </div>
     </div>
-    {% javascript 'master' %}
 
     <script>
         $(document).ready( function() {

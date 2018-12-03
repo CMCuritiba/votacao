@@ -12,4 +12,7 @@ urlpatterns = [
 	path('relatorio/votacao/imprime/', views.RelatorioVotacao.as_view(), name='relatorio-votacao-imprime'),
 	path('fecha/abertas/', views.FechaTodasAbertasIndex.as_view(), name='fecha-abertas-index'),
 	path('fecha/abertas/fecha', views.fecha_abertas, name='fecha-abertas'),
+	path('painel/', views.PainelIndex.as_view(), name='painel-index'),
+	path('gerencia/usuario/', views.AdminUsuariosIndex.as_view(), name='usuario-index'),
+	path('gerencia/usuario/altera/<int:pk>/', views.AdminUsuariosUpdate.as_view(), name='usuario-altera'),
 ]	

@@ -24,6 +24,8 @@ urlpatterns = [
 	path('textos_conclusao/<pro_codigo>/', views.consome_textos_conclusao, name='textos-conclusao'),
 	path('vota_contrario/<tipo_voto>/<id_texto>/', views.vota_contrario, name='vota-contrario'),
 	path('reinicia_votacao/', views.reinicia_votacao, name='reinicia-votacao'),
-]	
+	path('monta_painel/<int:pac_id>/<int:par_id>/<codigo_projeto>/', views.monta_painel, name='monta_painel'),
+	path('usuarios/', views.usuarios, name='usuarios'),
+]
 
 #urlpatterns += router.urls

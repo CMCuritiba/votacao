@@ -1,0 +1,161 @@
+{% extends "base_admin.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Controle de Usuários{% endblock %}
+
+{% block content %}
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">Usuários Cadastrados</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <table id="tusuarios" class="table table-striped table-hover table-bordered fonteTable" width="100%" cellspacing="0"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}    
+
+{% block extra_javascript %}
+
+    <script>
+
+        var tableUsuarios;
+
+
+        $(document).ready(function() {
+            
+            $.fn.dataTable.ext.errMode = 'none';
+
+            tableUsuarios = $('#tusuarios').DataTable({
+
+                rowReorder: {
+                    selector: 'td:nth-child(2)'
+                },
+                select: {
+                    style: 'single'
+                },
+                responsive: true,
+                "order": [[ 1, "asc" ]],
+                "columns": [
+                    { 
+                        title: "Id" ,
+                        data: 'id'
+                    },
+                    { 
+                        title: "Usuário" ,
+                        data: 'username',
+                        render: function(data, type, full, meta) {
+                            return '<a href="/admin/gerencia/usuario/altera/' + full.id + '">' + data + '</a>';
+                        }
+                    },
+                    { 
+                        title: "Nome",
+                        data: 'first_name',
+                    },
+                    { 
+                        title: "Sobrenome",
+                        data: 'last_name',
+                    },
+                    { 
+                        title: "Ativo",
+                        render: function(data, type, full, meta) {
+                            if (full.is_active == true)
+                                return '<i class="far fa-check-circle" aria-hidden="true" style="color:green;" title="Usuário ativo"></i>';
+                            else
+                                return '<i class="far fa-times-circle" aria-hidden="true" style="color:Tomato;" title="Usuário inativo"></i>';
+                        }
+                    },
+                    { 
+                        title: "Staff",
+                        render: function(data, type, full, meta) {
+                            if (full.is_staff == true)
+                                return '<i class="far fa-check-circle" aria-hidden="true" style="color:green;" title="Acessa admin"></i>';
+                            else
+                                return '<i class="far fa-times-circle" aria-hidden="true" style="color:Tomato;" title="Não acessa admin"></i>';
+                        }
+                    },
+                    { 
+                        title: "Superusuário",
+                        render: function(data, type, full, meta) {
+                            if (full.is_superuser == true)
+                                return '<i class="far fa-check-circle" aria-hidden="true" style="color:green;" title="É superusuário"></i>';
+                            else
+                                return '<i class="far fa-times-circle" aria-hidden="true" style="color:Tomato;" title="Não é superusuário"></i>';
+                        }
+                    },
+                    
+                ],
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [1],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [2],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [3],
+                        "visible": true,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [4],
+                        "visible": true,
+                        "sortable": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [5],
+                        "visible": true,
+                        "sortable": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets": [6],
+                        "visible": true,
+                        "sortable": false,
+                        "searchable": false
+                    },
+                            
+
+                ],
+                "language": {
+                    "info": "Páginas _PAGE_ de _PAGES_",
+                    "emptyTable": "Não há usuários cadastrados",
+                    "decimal": ",",
+                    "thousands": ".",
+                    "oPaginate": {
+                        "sFirst": '<span class="glyphicon glyphicon-fast-backward"></span>',
+                        "sLast": '<span class="glyphicon glyphicon-fast-forward"></span>',
+                        "sNext": '<span class="glyphicon glyphicon-forward"></span>',
+                        "sPrevious": '<span class="glyphicon glyphicon-backward"></span>'
+                    }
+                },
+                "deferRender": true,
+                "bPaginate" : true,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bInfo": false,
+                "ajax": {
+                    "url": "/api/usuarios",
+                    "dataSrc": "",
+                },
+                "sDom": '<"top"i>rt<"bottom"lp><"clear">',
+            });
+
+        });
+
+    </script>
+
+{% endblock %}
