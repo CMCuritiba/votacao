@@ -27,6 +27,10 @@ from votacao.votacao.models import Votacao, Voto, Restricao
 from votacao.api.views import relatorio_votacao
 from votacao.cron.jobs import fecha_votacoes
 
+from autentica.models import User as Usuario
+
+from .forms import UsuarioPermissaoForm
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -118,3 +122,19 @@ class PainelIndex(CMCAdminLoginRequired, SuccessMessageMixin, TemplateView):
         self.par_id = request.GET['par_id']
         self.codigo_projeto = request.GET['codigo_projeto']
         return super(PainelIndex, self).get(request, *args, **kwargs)   
+
+#--------------------------------------------------------------------------------------
+# Usuarios Index
+#--------------------------------------------------------------------------------------    
+class AdminUsuariosIndex(CMCVereadorLoginRequired, SuccessMessageMixin, TemplateView):
+    template_name = 'admin/usuario/index.html'           
+
+#--------------------------------------------------------------------------------------
+# Usuarios Update
+#--------------------------------------------------------------------------------------
+class AdminUsuariosUpdate(CMCAdminLoginRequired, SuccessMessageMixin, UpdateView):
+    model = Usuario
+    form_class = UsuarioPermissaoForm
+    success_url = '/admin/gerencia/usuario/'
+    success_message = "Permissões do usuário alteradas com sucesso"
+    template_name = 'admin/usuario/update.html'       

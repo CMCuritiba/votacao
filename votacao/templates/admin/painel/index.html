@@ -26,7 +26,7 @@
 				<div class="col-sm-8"><h4>Conclusão do Relator :</h4></div>
 				<div class="col-sm-4" align="right"><h4><% conclusao %></h4></div>
 			</div>
-			<div class="row" v-if="mostra">
+			<div class="row" v-if="mostra && !carregando">
 				<div class="col-sm-12" align="center"><h3>Voto dos vereadores</h3></div>
 			</div>
 			<div v-if="carregando">Carregando informações da votação...</div>
@@ -38,7 +38,8 @@
 					<div class="col-sm-4" align="right"><% voto.voto | votoExtenso %></div>
 				</div>
 			</div>
-			<div class="row" v-if="mostra">
+			<br/>
+			<div class="row" v-if="mostra && !carregando">
 				<div class="col-sm-12" align="center">
 					<button type="button" class="btn btn-success btn-lg">Favorável  <span class="badge"><% total_favoravel %></span></button>
 					<button type="button" class="btn btn-danger btn-lg">Contrário  <span class="badge"><% total_contrario %></span></button>
@@ -50,8 +51,9 @@
 		</section>
 	</div>
 </div>
-<div class="row">
-	<div class="col-sm-12" align="center"><h4><% status_votacao | votacaoStatus %></h4></div>
+
+<div :class="votacaoClasse(status_votacao)">
+	<h3 align="center"><% status_votacao | votacaoStatus %></h3>
 </div>
 
 {% endblock content %}
@@ -82,7 +84,7 @@
 				comissao: null,
 				iniciativa: null,
 				conclusao: null,
-				mostra: false,
+				mostra: true,
 			}
 		},
 		filters: {
@@ -108,9 +110,16 @@
     			else if (status === 'A')
     				return 'Votação em andamento';
     		},
-
   		},
   		methods: {
+  			votacaoClasse(status) {
+    			if (status === 'F')
+    				return 'alert alert-votacao-aguardando';
+    			else if (status === 'V')
+    				return 'alert alert-votacao-encerrada';
+    			else if (status === 'A')
+    				return 'alert alert-votacao-aberta';
+    		},
   			classeVoto (voto){
     			if (voto == 'F')
     				return "row voto alert-success";
@@ -126,12 +135,21 @@
     				return "row";
     		},
     		formataTotais() {
-    			if (this.totais === null) {
+    			if (this.totais === null || this.totais === undefined) {
     				this.total_favoravel = '0';
     				this.total_favoravel_restricoes = '0';
 					this.total_contrario = '0';
 					this.total_abstencao = '0';
 					this.total_vistas = '0';
+					this.mostra = false;
+    			}
+    			else {
+    				this.total_favoravel = this.totais.favoravel;
+    				this.total_favoravel_restricoes = this.totais.favoravel_restricoes;
+    				this.total_contrario = this.totais.contrario;
+    				this.total_abstencao = this.totais.abstencao;
+    				this.total_vistas = this.totais.vista;
+    				this.mostra = true;
     			}
     		},
     		carregaDados() {
@@ -142,24 +160,18 @@
 					this.codigo_proposicao = response.data.codigo_proposicao,
 					this.sumula = response.data.sumula,
 					this.votos = response.data.VotoJSONs,
-					this.totais = response.data.TotalJSONs,
+					this.totais = response.data.TotalJSONs[0],
 					this.comissao = response.data.comissao,
 					this.info = response.data,
 					this.iniciativa = response.data.iniciativa,
-					this.conclusao = response.data.conclusao
+					this.conclusao = response.data.conclusao,
+					this.formataTotais()
 				))
 				.catch(error => {
 					console.log(error),
 					this.errored = true
 				})
 				.finally(() => this.carregando = false)
-				this.formataTotais();
-				if (this.votos == null || this.votos == '') {
-					this.mostra = false;
-				}
-				else {
-					this.mostra = true;
-				}
     		},
     		
   		},

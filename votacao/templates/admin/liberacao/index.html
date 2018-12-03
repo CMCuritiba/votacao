@@ -289,8 +289,14 @@
                         "orderable": false,
                         "visible": true,
                         "render" : function(data, type, full, meta) {
+                            return ""
+                        },
+
+                        /*
+                        "render" : function(data, type, full, meta) {
                             return "<a href='javascript:painelVotacao(" + full.pac_id + "," + full.par_id + ",\"" + full.codigo_proposicao + "\")'><span id='painel' class='badge  progress-bar-default'>Painel</span></a>";
                         },
+                        */
                         "className": "dt-center"
                     },
                 ],

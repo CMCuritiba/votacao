@@ -25,6 +25,8 @@ from consumer.lib.views import SPLReuniaoComissaoView
 from consumer.lib.msconsumer import MSCMCConsumer
 from consumer.lib.helper import ServiceHelper
 
+from autentica.models import User as Usuario
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -171,24 +173,23 @@ def vota(request, tipo_voto):
         widget_json = {}
         votacao = request.POST['votacao']
         if (votacao != None):
-            with transaction.atomic():
-                try:
-                    votacao = Votacao.objects.get(id=votacao)
-                    if votacao.status == 'A':
-                        voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
-                        if voto.voto == 'V':
-                            logger.info("Pedido de vistas por %s", request.user.username)
-                            Voto.objects.filter(votacao=votacao).exclude(voto='V').delete()
-                            votacao.status = 'V'
-                            votacao.save()
-                            logger.info("Votação encerrada por pedido de vistas por %s", request.user.username)
-                            response = JsonResponse({'status':'true','message':'Pedido de vistas', 'tipo_voto': tipo_voto}, status=200)
-                        else:
-                            logger.info("Voto %s por %s", tipo_voto, request.user.username)
-                            response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
-                except Votacao.DoesNotExist:
-                    response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
-                    return response
+            try:
+                votacao = Votacao.objects.get(id=votacao)
+                if votacao.status == 'A':
+                    voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+                    if voto.voto == 'V':
+                        logger.info("Pedido de vistas por %s", request.user.username)
+                        Voto.objects.filter(votacao=votacao).exclude(voto='V').delete()
+                        votacao.status = 'V'
+                        votacao.save()
+                        logger.info("Votação encerrada por pedido de vistas por %s", request.user.username)
+                        response = JsonResponse({'status':'true','message':'Pedido de vistas', 'tipo_voto': tipo_voto}, status=200)
+                    else:
+                        logger.info("Voto %s por %s", tipo_voto, request.user.username)
+                        response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+            except Votacao.DoesNotExist:
+                response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
+                return response
     return response 
 
 # -----------------------------------------------------------------------------------
@@ -323,26 +324,25 @@ def reinicia_votacao(request):
         par_id = request.POST['par_id']
         codigo_proposicao = request.POST['codigo_proposicao']
         if (pac_id != None and par_id != None and codigo_proposicao != None):
-            with transaction.atomic():
-                try:
-                    votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_proposicao)
-                    if votacao.status == 'V':
-                        logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s reiniciada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
-                        
-                        votos = votacao.voto_set.all()
-                        for voto in votos:
-                            voto.votocontrario_set.all().delete()
-                            voto.restricao_set.all().delete()
-                        votos.delete()
-                        votacao.status = 'A'
-                        votacao.save()
-                        response = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
-                    else:
-                        logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s tentativa de reiniciar votação não fechada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
-                except Votacao.DoesNotExist:
-                    logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s não encontrada para reiniciar por %s", pac_id, par_id, codigo_proposicao, request.user.username)
-                    response = JsonResponse({'status':'false','message':'Erro ao reiniciar votação.'}, status=404)
-                    return response
+            try:
+                votacao = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_proposicao)
+                if votacao.status == 'V':
+                    logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s reiniciada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+                    
+                    votos = votacao.voto_set.all()
+                    for voto in votos:
+                        voto.votocontrario_set.all().delete()
+                        voto.restricao_set.all().delete()
+                    votos.delete()
+                    votacao.status = 'A'
+                    votacao.save()
+                    response = JsonResponse({'status':'true','message':'Votação reiniciada com sucesso'}, status=200)
+                else:
+                    logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s tentativa de reiniciar votação não fechada por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+            except Votacao.DoesNotExist:
+                logger.info("Votação pac_id %s, par_id %s codigo_proposicao %s não encontrada para reiniciar por %s", pac_id, par_id, codigo_proposicao, request.user.username)
+                response = JsonResponse({'status':'false','message':'Erro ao reiniciar votação.'}, status=404)
+                return response
     return response     
 
 # -----------------------------------------------------------------------------------
@@ -413,3 +413,22 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
                 return JsonResponse(data, safe=False)           
     else:
         return JsonResponse(data, safe=False)           
+
+# -----------------------------------------------------------------------------------
+# chamada API para retornar usuarios do sistema
+# -----------------------------------------------------------------------------------
+def usuarios(request):
+    usuarios_json = []
+    usuarios = Usuario.objects.all()
+    for usuario in usuarios:
+        e_json = {}
+        e_json['id'] = usuario.id
+        e_json['first_name'] = usuario.first_name
+        e_json['last_name'] = usuario.last_name
+        e_json['username'] = usuario.username
+        e_json['is_staff'] = usuario.is_staff
+        e_json['is_active'] = usuario.is_active
+        e_json['is_superuser'] = usuario.is_superuser
+        usuarios_json.append(e_json)
+
+    return JsonResponse(usuarios_json, safe=False)
