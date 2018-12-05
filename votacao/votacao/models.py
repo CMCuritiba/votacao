@@ -42,6 +42,7 @@ class Votacao(models.Model):
 class Voto(models.Model):
 	class Meta:
 		verbose_name_plural = 'Votos'
+		unique_together = ('votacao', 'vereador')
 
 	FAVORAVEL = 'F'
 	FAVORAVEL_RESTRICOES = 'R'

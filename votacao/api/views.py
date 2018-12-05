@@ -190,6 +190,10 @@ def vota(request, tipo_voto):
             except Votacao.DoesNotExist:
                 response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
                 return response
+            except IntegrityError:
+                response = JsonResponse({'status':'false','message':'Tentativa de votar mais de 1 vez.'}, status=404)
+                logger.info("Tentativa de votar mais de uma vez por %s", request.user.username)
+                return response                
     return response 
 
 # -----------------------------------------------------------------------------------
@@ -210,6 +214,10 @@ def vota_restricao(request, tipo_voto, restricao):
             except Votacao.DoesNotExist:
                 response = JsonResponse({'status':'false','message':'Erro ao tentar votar.'}, status=404)
                 return response
+            except IntegrityError:
+                response = JsonResponse({'status':'false','message':'Tentativa de votar mais de 1 vez.'}, status=404)
+                logger.info("Tentativa de votar mais de uma vez por %s", request.user.username)
+                return response                                
             response = JsonResponse({'status':'true','message':'Votação efetuada com sucesso', 'tipo_voto': restricao.voto.voto}, status=200)
     return response 
 
