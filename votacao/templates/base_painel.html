@@ -2,7 +2,6 @@
 <html lang="pt-BR">
     <head>
         {% load pipeline %}
-        {% load static %}
 
         {% stylesheet 'master' %}
         <meta charset="utf-8">
@@ -11,26 +10,26 @@
 
     <body>
 
-    {% javascript 'master' %}
-
-    <div class="page-header">
-        <img src="{% static "images/brasao_transparente.png" %}" width="70px" class="c-brasao"/>
-        <h1 style="margin-top:-10px;">Sistema de Votação - Painel</h1>
-    </div>
     <div id="app">
         <div class="container">
             
             <div class="starter-template">
+                <div id="componentes">
+                    <cabecalho titulo="Painel de Votação"></cabecalho>
+                </div>
 
                 {% block content %}{% endblock content %}
 
             </div>
         </div>
     </div>
-    
+
+    {% javascript 'master' %}
+
     {% block extra_javascript %}
 
     {% endblock %}
+
   </body>
 </html>
 

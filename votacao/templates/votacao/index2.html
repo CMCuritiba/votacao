@@ -1,0 +1,23 @@
+{% extends "base_vereador.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+{% endblock %}    
+
+
+{% block extra_javascript %}
+<script type="text/javascript">
+
+	var app = new Vue({
+		el: '#app',
+		delimiters: ["<%","%>"],
+		data() {
+			return {
+			}
+		}
+	})
+
+</script>	
+{% endblock %}
