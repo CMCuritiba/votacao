@@ -10,11 +10,13 @@
 
     <body>
 
-    <div id="componentes">
+    <div id="app">
         <div class="container">
             
             <div class="starter-template">
-                <cabecalho_compacto titulo="Sistema de Votação" vereador="{{ user.username }}" link="/autentica/sair"></cabecalho_compacto>
+                <div id="componentes">
+                    <cabecalho_compacto titulo="Sistema de Votação" vereador="{{ user.username }}" link="/autentica/sair"></cabecalho_compacto>
+                </div>
 
                 {% for message in messages %}
                     {% if 'success' in message.tags %}

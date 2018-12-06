@@ -171,7 +171,9 @@ def vota(request, tipo_voto):
 
     if request.method == 'POST':
         widget_json = {}
-        votacao = request.POST['votacao']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        votacao = body['votacao']
         if (votacao != None):
             try:
                 votacao = Votacao.objects.get(id=votacao)
@@ -204,7 +206,9 @@ def vota_restricao(request, tipo_voto, restricao):
 
     if request.method == 'POST':
         widget_json = {}
-        votacao = request.POST['votacao']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        votacao = body['votacao']
         if (votacao != None):
             try:
                 votacao = Votacao.objects.get(id=votacao)
@@ -308,7 +312,9 @@ def vota_contrario(request, tipo_voto, id_texto):
 
     if request.method == 'POST':
         widget_json = {}
-        votacao = request.POST['votacao']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        votacao = body['votacao']
         if (votacao != None):
             try:
                 votacao = Votacao.objects.get(id=votacao)
