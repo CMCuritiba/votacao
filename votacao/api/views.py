@@ -12,7 +12,7 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 
 from votacao.votacao.forms import JSONVotacaoForm
-from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario
+from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario, Restricao
 from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert, PainelVotacaoJSON
 from votacao.api.util.db_util import verifica
 
@@ -276,17 +276,20 @@ def relatorio_votacao(request, pac_id):
 
         if rec_id is not None and con_id is not None:
             for voto in votacao.lista_votos():
+                desc_restricao = ''
                 if voto.voto == 'F':
                     tot_favoravel += 1
                 elif voto.voto == 'C':
                     tot_contrario += 1
                 elif voto.voto == 'R':
                     tot_favoravel_restricoes += 1
+                    restricao = Restricao.objects.get(voto=voto)
+                    desc_restricao = restricao.restricao
                 elif voto.voto == 'A':
                     tot_abstencao += 1
                 elif voto.voto == 'V':
                     tot_vista += 1
-                votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto))
+                votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, desc_restricao))
             votacao_incluir.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
         reuniao_js.VotacaoJSONs.append(votacao_incluir)     
 

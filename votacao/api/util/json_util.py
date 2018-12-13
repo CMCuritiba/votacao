@@ -47,9 +47,10 @@ class JsonConvert(object):
 
 @JsonConvert.register
 class VotoJSON(object):
-    def __init__(self, vereador:str=None, voto:str=None):
+    def __init__(self, vereador:str=None, voto:str=None, restricao:str=None):
         self.vereador = vereador
         self.voto = voto
+        self.restricao = restricao
         return                        
 
 @JsonConvert.register
