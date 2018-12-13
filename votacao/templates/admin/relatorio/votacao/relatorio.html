@@ -43,30 +43,35 @@
                     {% for voto in votacao.VotoJSONs %}
                         <tr>
                             <td colspan="6">{{ voto.vereador }}</td>
-                            <td>{{ voto.voto|voto_extenso }}</td>
+                            <td width="30%" align="right">{{ voto.voto|voto_extenso }}</td>
                         </tr>
+                        {% if voto.voto == 'R' %}
+                            <tr>
+                                <td colspan="7" align="right">{{ voto.restricao }}</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </table>
                 <table class="reuniao">
                     <tr class="reuniao">
                         <td colspan="6">TOTAL VOTOS FAVORÁVEL</td>
-                        <td>{{ votacao.TotalJSONs.0.favoravel }}</td>
+                        <td align="right">{{ votacao.TotalJSONs.0.favoravel }}</td>
                     </tr>
                     <tr>
                         <td colspan="6">TOTAL VOTOS FAVORÁVEL COM RESTRIÇÕES</td>
-                        <td>{{ votacao.TotalJSONs.0.favoravel_restricoes }}</td>
+                        <td align="right">{{ votacao.TotalJSONs.0.favoravel_restricoes }}</td>
                     </tr>
                     <tr>
                         <td colspan="6">TOTAL VOTOS CONTRÁRIO</td>
-                        <td>{{ votacao.TotalJSONs.0.contrario }}</td>
+                        <td align="right">{{ votacao.TotalJSONs.0.contrario }}</td>
                     </tr>
                     <tr>
                         <td colspan="6">TOTAL VOTOS VISTAS</td>
-                        <td>{{ votacao.TotalJSONs.0.vista }}</td>
+                        <td align="right">{{ votacao.TotalJSONs.0.vista }}</td>
                     </tr>
                     <tr>
                         <td colspan="6">TOTAL VOTOS ABSTENÇÃO</td>
-                        <td>{{ votacao.TotalJSONs.0.abstencao }}</td>
+                        <td align="right">{{ votacao.TotalJSONs.0.abstencao }}</td>
                     </tr>
                 </table>
             {% endfor %}

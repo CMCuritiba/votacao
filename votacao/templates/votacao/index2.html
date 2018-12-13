@@ -1,13 +1,139 @@
 {% extends "base_vereador.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}{% endblock %}
 
 {% block content %}
-{% endblock %}    
 
+<section v-if="errored">
+	<p>Erro ao carregar informações da votação</p>
+</section>
+<section v-else>
+	<div v-if="aguardando" class="jumbotron text-center">
+    	<h1>Aguardando liberação para votação</h1>
+	</div>
+	<div v-else>
+		<div id="pnl_projeto" class="panel panel-primary">
+	   	<div id="projeto" class="panel-heading"><h3><% proposicao.codigo %></h3></div>
+	        <div class="panel-body">
+	            <div class="row">
+	                <div class="col-sm-12">
+	                    <h3 id="iniciativa">Iniciativa: <% proposicao.iniciativa %></h3>
+	                </div>
+	            </div>
+	            <div class="row">
+	                <div class="col-sm-12">
+	                    <h4 id="ementa"><% proposicao.sumula %></h4>
+	                </div>
+	            </div>
+	            <div class="row">
+	                <div class="col-sm-12">
+	                    <h4 id="conclusao">Conclusão: <% proposicao.conclusao_relator %></h4>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+
+	    <div v-if="votou" class="jumbotron text-center">
+	    	<h1>Voto realizado com sucesso.</h1><br/>
+	    	<h2>Vereador {{ user.get_full_name }} votou: </h2><div v-html="resultadoVoto()"></div>
+	    </div>
+	    <div v-else-if="salvando" class="jumbotron text-center">
+	    	<h1>Registrando voto...</h1><img src="{% static 'images/ajax-loader.gif' %}"><br/>
+	    </div>
+	    <div id="dbotoes" v-else class="jumbotron text-center">
+	    	<button type="button" id="bt_favoravel" class="btn btn-success btn-lg botao" v-on:click="votaFavoravel"> FAVORÁVEL </button>
+	    	<button type="button" class="btn btn-warning btn-lg botao" v-on:click="votaRestricoes"> FAVORÁVEL COM RESTRIÇÕES </button>
+	    	<button type="button" id="bt_contrario" class="btn btn-danger btn-lg botao" v-on:click="votaContrario"> CONTRÁRIO </button>
+	    	<button type="button" class="btn btn-primary btn-lg botao" v-on:click="votaAbstencao"> ABSTENÇÃO </button>
+	    	<button type="button" class="btn btn-info btn-lg botao" v-on:click="votaVista"> VISTA </button>
+	    </div>
+    	
+	</div>
+</div>
+	</div>
+</section>
+
+<!-- Modal -->
+<div v-if="modalVoto">
+	<transition name="modal">
+		<div class="modal-mask">
+			<div class="modal-wrapper">
+	  			<div class="modal-dialog modal-lg" role="document">
+	    			<div class="modal-content">
+	      				<div class="modal-header">
+	        				<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+	      				</div>
+	      				<div class="modal-body">
+	        				<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
+	      				</div>
+	      				<div class="modal-footer">
+	        				<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalVoto">Cancelar</button>
+	        				<button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao" v-on:click="vota">Confirma</button>
+	      				</div>
+	    			</div>
+	  			</div>
+			</div>
+		</div>
+	</transition>
+</div>
+
+<!-- Modal Restrições-->
+<div v-if="modalRestricao">
+	<transition name="modal">
+		<div class="modal-mask">
+			<div class="modal-wrapper">
+  				<div class="modal-dialog modal-lg">
+    				<div class="modal-content">
+      					<div class="modal-header">
+        					<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+      					</div>
+      					<div class="modal-body">
+        					<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
+        					<textarea class="form-control col-xs-12" rows="10" id="restricao" v-model="restricao"></textarea>
+      					</div>
+      					<div class="modal-footer">
+        					<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalRestricao">Cancelar</button>
+        					<button type="button" class="btn btn-primary btn-lg" v-on:click="vota">Confirma</button>
+      					</div>
+    				</div>
+  				</div>
+			</div>
+		</div>
+	</transition>
+</div>
+
+<!-- Modal Contrário-->
+<div v-if="modalContrario">
+	<transition name="modal">
+		<div class="modal-mask">
+			<div class="modal-wrapper">
+  				<div class="modal-dialog modal-lg" role="document">
+    				<div class="modal-content">
+      					<div class="modal-header">
+        					<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+      					</div>
+      					<div class="modal-body">
+        					<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
+        					<div id="div_combo_contrario"></div>
+      					</div>
+      					<div class="modal-footer">
+        					<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalContrario">Cancelar</button>
+        					<button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao" v-on:click="vota">Confirma</button>
+      					</div>
+    				</div>
+  				</div>
+			</div>
+		</div>
+	</transition>
+</div>			
+
+
+{% endblock content %}
 
 {% block extra_javascript %}
+
 <script type="text/javascript">
 
 	var app = new Vue({
@@ -15,9 +141,195 @@
 		delimiters: ["<%","%>"],
 		data() {
 			return {
+				votoAgora: null,
+				modalVoto: false,
+				modalRestricao: false,
+				modalContrario: false,
+				descVoto: null,
+				classeVoto: null,
+				restricao: null,
+				aguardando: true,
+				salvando: false,
+				errored: false,
+				votou: false,
+				proposicao: {
+					codigo: null,
+					iniciativa: null,
+					sumula: null,
+					conclusao_relator: null,
+					votado: false
+				},
+				voto: {
+					votacao_id: null,
+					tipo_voto: null
+				}
 			}
+		},
+		methods: {
+			fechaModalVoto() {
+				this.modalVoto = false;
+			},
+			fechaModalRestricao() {
+				this.modalRestricao = false;
+			},
+			fechaModalContrario() {
+				this.modalContrario = false;
+			},
+			carregaDados() {
+				axios
+				.get('/api/retorna_aberto/')
+				.then(response => {
+					if (response.data.length > 0) {
+						this.proposicao.codigo = response.data[0].codigo_proposicao;
+						this.proposicao.iniciativa = response.data[0].iniciativa;
+						this.proposicao.sumula = response.data[0].sumula;
+						this.proposicao.conclusao_relator = response.data[0].conclusao_relator;
+						this.proposicao.votado = response.data[0].votado;
+						this.voto.votacao_id = response.data[0].id;
+						this.voto.tipo_voto = response.data[0].tipo_voto;
+						this.aguardando = false;
+						this.votou = response.data[0].votado
+						verifica_contrario(this.proposicao.codigo);
+						this.salvando = false;
+					}
+					else {
+						this.aguardando = true;
+						this.salvando = false;
+					}
+				})
+				.catch(error => {
+					console.log(error);
+					this.errored = true;
+					this.aguardando = false;
+				})
+				.finally(() => this.carregando = false)
+    		},
+    		resultadoVoto() {
+	            if (this.voto.tipo_voto == 'F')
+	                return '<h2 class="text-success">FAVORÁVEL</h2>';
+	            else if (this.voto.tipo_voto == 'R')
+	                return '<h2 class="text-warning">FAVORÁVEL COM RESTRIÇÕES</h2>';
+	            else if (this.voto.tipo_voto == 'C')
+	                return '<h2 class="text-danger">CONTRÁRIO</h2>';
+	            else if (this.voto.tipo_voto == 'A')
+	                return '<h2 class="text-primary">ABSTENÇÃO</h2>';
+	            else if (this.voto.tipo_voto == 'V')
+	                return '<h2 class="text-info">VISTA</h2>';
+	            else
+	                return '<h2 class="text-danger">ERRO</h2>'
+        	}
+        	,
+        	votaFavoravel() {
+        		this.votoAgora = 'F';
+        		this.modalVoto = true;
+        		this.classeVoto = "text-success";
+        		this.descVoto = "FAVORÁVEL";
+        	},
+        	votaRestricoes() {
+        		this.votoAgora = 'R'
+        		this.modalRestricao = true;
+        		this.classeVoto = "text-warning";
+        		this.descVoto = "FAVORÁVEL COM RESTRIÇÕES";
+        	},
+        	votaContrario() {
+        		this.votoAgora = 'C'
+        		this.modalContrario = true;
+        		this.classeVoto = "text-danger";
+        		this.descVoto = "CONTRÁRIO";
+        	},
+        	votaAbstencao() {
+        		this.votoAgora = 'A'
+        		this.modalVoto = true;
+        		this.classeVoto = "text-primary";
+        		this.descVoto = "ABSTENÇÃO";
+        	},
+        	votaVista() {
+        		this.votoAgora = 'V'
+        		this.modalVoto = true;
+        		this.classeVoto = "text-info";
+        		this.descVoto = "VISTA";
+        	},
+        	vota() {
+        		if (this.votoAgora == 'R') {
+                    request_url = "/api/vota_restricao/" + this.votoAgora + "/" + this.restricao + "/";
+                    this.modalRestricao = false;
+                }
+                else if (this.votoAgora == 'C') {
+                    id_texto = $('#combo_contrario option:selected').val();
+                    request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
+                    this.modalContrario = false;
+                }
+                else if (this.votoAgora == 'F' || this.votoAgora == 'V' || this.votoAgora == 'A') {
+                    request_url = "/api/vota/" + this.votoAgora + "/";
+                    this.modalVoto = false;
+                }
+
+                if (request_url != undefined) {
+
+                	this.salvando = true;
+                	this.token = '{{csrf_token}}';
+
+                	var data = JSON.stringify({votacao:this.voto.votacao_id});
+
+
+	                axios({
+	                	method: 'post',
+	                	url: request_url,
+	                	headers: {
+	                		"X-CSRFToken": this.token,
+	                		'Content-Type': 'application/x-www-form-urlencoded',
+	                		dataType: 'json',
+	                	},
+	                	data: data
+	                })
+	                .then(response => {
+	        	     	this.salvando = true;
+	                })
+	                .catch(error => {
+	                	this.salvando = false;
+	                })
+	            }
+        	}
+		},
+		mounted() {
+			this.carregaDados();
+			this.timer = setInterval(this.carregaDados, 5000);
 		}
+
 	})
+
+	function verifica_contrario(codigo_proposicao) {
+        request_url = '/api/textos_conclusao/' + codigo_proposicao + '/';
+        $.ajax({
+            url: request_url,
+            type: 'GET',
+            accepts: 'application/json',
+            dataType: 'json',
+            success: function(result){
+                //console.log(result);
+                if (result.length > 0) {
+                    //console.log("HABILITAR BOTAO CONTRARIO");
+                    $('#bt_contrario').attr("enabled","enabled");
+                    toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
+                    $.each(result, function(index, element) {
+                        toAppend += '<option value="' + element.txt_id + '">' + element.vereador + ' - ' + element.tcp_nome + '</option>';
+                    });
+                    toAppend += '</select>';
+                    //console.log(toAppend);
+                    $('#div_combo_contrario').empty();
+                    $('#div_combo_contrario').append(toAppend);
+                    $('.selectpicker').selectpicker();
+                }
+                else {
+                    //console.log("DESABILITAR BOTAO CONTRARIO");
+                    $('#bt_contrario').attr("disabled","disabled");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Problema ao carregar informações do projeto.');
+            }
+        })
+    }
 
 </script>	
 {% endblock %}
