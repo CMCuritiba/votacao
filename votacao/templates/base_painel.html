@@ -2,6 +2,7 @@
 <html lang="pt-BR">
     <head>
         {% load pipeline %}
+        {% load votacao_extras %}
 
         {% stylesheet 'master' %}
         <meta charset="utf-8">
@@ -15,7 +16,7 @@
             
             <div class="starter-template">
                 <div id="componentes">
-                    <cabecalho titulo="Painel de Votação"></cabecalho>
+                    <cabecalho titulo="Painel de Votação" urljson="{% settings_value 'MSCMC_SERVER' %}/api/misc/connection/"></cabecalho>
                 </div>
 
                 {% block content %}{% endblock content %}
