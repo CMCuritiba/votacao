@@ -3,6 +3,7 @@ from mimetypes import guess_type
 from django import template
 from base64 import b64encode
 from django.contrib.staticfiles import finders
+from django.conf import settings
 
 import os
 import json
@@ -69,3 +70,7 @@ def voto_extenso(tipo_voto):
 @register.filter
 def loadjson(data):
     return json.loads(data)
+
+@register.simple_tag
+def settings_value(name):
+    return getattr(settings, name, "")    

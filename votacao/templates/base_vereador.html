@@ -2,6 +2,7 @@
 <html lang="pt-BR">
     <head>
         {% load pipeline %}
+        {% load votacao_extras %}
         {% stylesheet 'master' %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -15,7 +16,7 @@
             
             <div class="starter-template">
                 <div id="componentes">
-                    <cabecalho_compacto titulo="Sistema de Votação" vereador="{{ user.username }}" link="/autentica/sair"></cabecalho_compacto>
+                    <cabecalho_compacto titulo="Sistema de Votação" vereador="{{ user.username }}" link="/autentica/sair" urljson="{% settings_value 'MSCMC_SERVER' %}/api/misc/connection/"></cabecalho_compacto>
                 </div>
 
                 {% for message in messages %}
