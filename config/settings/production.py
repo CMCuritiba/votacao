@@ -160,17 +160,17 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 #    }
 #}
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': '/var/run/redis/redis.sock',
-        'OPTIONS': {
-            'DB': 1,
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'IGNORE_EXCEPTIONS': True
-        }
-    }
-}
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django_redis.cache.RedisCache',
+#        'LOCATION': '/var/run/redis/redis.sock',
+#        'OPTIONS': {
+#            'DB': 1,
+#            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#            'IGNORE_EXCEPTIONS': True
+#        }
+#    }
+# }
 
 
 # Sentry Configuration
