@@ -235,8 +235,14 @@ def cria_links():
 
 @task
 def restart_nginx_supervisor():
+	sudo('supervisorctl stop celery')
+	# ainda não foi resolvido no celery processo para matar os filhos via supervisor
+	# só mata o processo 'pai', deixando os filhos zumbis
+	# o comando abaixo detona os zumbis na mão
+	sudo('pkill -f {}'.format('/usr/share/envs/chamados/bin/celery'))
 	sudo('supervisorctl reread')
 	sudo('supervisorctl restart {}'.format(PROJECT_NAME))
+	sudo('supervisorctl start celery')
 	sudo('service nginx restart')
 
 @task
