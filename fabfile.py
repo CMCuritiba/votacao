@@ -241,7 +241,7 @@ def restart_nginx_supervisor():
 	# o comando abaixo detona os zumbis na mão
 	sudo('pkill -f {}'.format('/usr/share/envs/chamados/bin/celery'))
 	sudo('supervisorctl reread')
-	sudo('supervisorctl restart {}'.format(PROJECT_NAME))
+	sudo('supervisorctl start {}'.format(PROJECT_NAME))
 	sudo('supervisorctl start celery')
 	sudo('service nginx restart')
 
