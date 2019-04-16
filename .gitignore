@@ -65,3 +65,4 @@ staticfiles/
 components/
 *migrations
 *.db
+.vscode
