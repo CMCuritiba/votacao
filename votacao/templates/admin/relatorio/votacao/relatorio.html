@@ -17,14 +17,14 @@
 
 {% block content %}
     <div id="content">
-        <table class="bordered">
-    	    <tr class="reuniao"><td><h1>{{ votacoes.ini_nome }}</h1></td></tr>
-            <tr><td><h3>Número da Reunião: {{ votacoes.rec_numero }}</h3></td></tr>
-            <tr><td><h3>Reunião: {{ votacoes.rec_tipo_reuniao }}</h3></td></tr>
-            <tr><td><h3>Data: {{ votacoes.rec_data }}</h3></td></tr>
-        </table>
     	{% if votacoes %}
     		{% for votacao in votacoes.VotacaoJSONs %}
+                <table class="bordered">
+                    <tr class="reuniao"><td><h1>{{ votacoes.ini_nome }}</h1></td></tr>
+                    <tr><td><h3>Número da Reunião: {{ votacoes.rec_numero }}</h3></td></tr>
+                    <tr><td><h3>Reunião: {{ votacoes.rec_tipo_reuniao }}</h3></td></tr>
+                    <tr><td><h3>Data: {{ votacoes.rec_data }}</h3></td></tr>
+                </table>
                 <table class="reuniao">
                     <tr class="proposicao"><td colspan="7"><h1>{{ votacao.codigo_proposicao }}</h1></td></tr>
                     <tr>
@@ -74,6 +74,9 @@
                         <td align="right">{{ votacao.TotalJSONs.0.abstencao }}</td>
                     </tr>
                 </table>
+                <div>
+                    <pdf:nextpage /> 
+                </div> 
             {% endfor %}
     	{% else %}
     		<h2 align="center">NENHUMA VOTAÇÃO COMPUTADA</h2>
