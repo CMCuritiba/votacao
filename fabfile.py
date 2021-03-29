@@ -274,7 +274,7 @@ def update_autenticacao():
 	with cd(PROJECT_ROOT):
 		with source_virtualenv():
 			# Roda o bower install
-			sudo('pip install https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.3.tar.gz --upgrade --no-cache-dir')
+			sudo('pip install https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.4.tar.gz --upgrade --no-cache-dir')
 			#run('python manage.py makemigrations votacao --settings=config.settings.production')
 			#run('./manage.py makemigrations autentica --settings=config.settings.production')
 			#run('./manage.py makemigrations cadastro --settings=config.settings.production')
