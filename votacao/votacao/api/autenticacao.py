@@ -13,7 +13,7 @@ from autentica.util.mixin import CMCLoginRequired, CMCAdminLoginRequired
 # Autenticador de acesso. Apenas vereadores.
 #----------------------------------------------------------------------------------------------
 class CMCVereadorLoginRequired(CMCLoginRequired):
-	message_url = '/acesso/vereador'
+	message_url = '/autentica/loga'
 
 	def dispatch(self, request, *args, **kwargs):
 
@@ -21,8 +21,8 @@ class CMCVereadorLoginRequired(CMCLoginRequired):
 		if retorno.status_code == 302:
 			return HttpResponseRedirect(retorno.url)
 
-		if (request.user.pessoa != None):
-			search_url = '{}/api/funcionario/{}/'.format(settings.MSCMC_SERVER, request.user.pessoa)
+		if (request.user.cpf != None):
+			search_url = '{}/api/funcionario_cpf/{}/'.format(settings.MSCMC_SERVER, request.user.cpf)
 			r = requests.get(search_url, verify=False)
 			pessoa = r.json()
 			try:

@@ -1,9 +1,9 @@
 
-Django>=2.1.1
+Django==2.1.1
 #Django==1.10.8
 #Django==1.9.13
 
-Markdown>=2.6.11
+Markdown==2.6.11
 
 Underscore>=0.0.30000001
 
@@ -21,7 +21,7 @@ django-extensions>=2.0.7
 
 django-filter>=1.1.0
 
-django-pipeline>=1.6.14
+django-pipeline==1.6.14
 
 djangorestframework>=3.8.2
 
@@ -73,7 +73,8 @@ https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-co
 
 # Relatorios
 xhtml2pdf
-django-easy-pdf
+django-easy-pdf==0.1.1
+reportlab==3.5.23
 
 # Json
 jsonref
