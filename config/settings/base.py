@@ -473,8 +473,8 @@ LDAP_ALWAYS_SEARCH_BIND = True
 
 # LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "dc=cmc,dc=pr,dc=gov,dc=br"
 # LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "cmc.pr.gov.br"
-LDAP_AUTH_CONNECTION_USERNAME = "cn=authproxy,dc=cmc,dc=pr,dc=gov,dc=br"
-LDAP_AUTH_CONNECTION_PASSWORD = "authproxy"
+# LDAP_AUTH_CONNECTION_USERNAME = "cn=authproxy,dc=cmc,dc=pr,dc=gov,dc=br"
+# LDAP_AUTH_CONNECTION_PASSWORD = "authproxy"
 # LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "ECDC"
 # LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "cmc.pr.gov.br"
 
