@@ -400,7 +400,6 @@ PIPELINE = {
 }
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
-#STATICFILES_STORAGE = 'django_pipeline_forgiving.storages.PipelineForgivingStorage'
 
 # BOWER
 # ------------------------------------------------------------------------------
@@ -408,11 +407,8 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 BOWER_COMPONENTS_ROOT = str(ROOT_DIR.path('components'))
 BOWER_INSTALLED_APPS = (
     'jquery#1.9.1',
-    #'jquery',
     'underscore',
     'bootstrap#3',
-    #'bootstrap-calendar',
-    #'jasny-bootstrap',
     'datatables',
     'datatables-bootstrap3',
     'bootstrap-3-datepicker',
@@ -420,25 +416,16 @@ BOWER_INSTALLED_APPS = (
     'datatables.net-responsive-bs',
     'datatables-datetime-moment',
     'bootstrap-select',
-    #'eonasdan-bootstrap-datetimepicker#latest',
-    #'bootstrap3-datetimepicker',
-    #'vue',
-    #'vue-strap',
     'fontawesome',
     'moment',
     'axios',
     'vue',
-    #'fullcalendar',
-    #'bootstrap-select'
 )
 
 # LDAP
 # ------------------------------------------------------------------------------
-#LDAP_AUTH_URL = "ldap://ldap"
 LDAP_AUTH_URL = env('LDAP_AUTH_URL', default='')
 LDAP_AUTH_USE_TLS = env('LDAP_AUTH_USE_TLS', default=False, cast=bool)
-# LDAP_AUTH_USE_TLS = True
-# LDAP_AUTH_SEARCH_BASE = env('LDAP_AUTH_SEARCH_BASE', default='')
 LDAP_AUTH_SEARCH_BASE = env('LDAP_AUTH_SEARCH_BASE', default='')
 LDAP_AUTH_BIND_BASE = env('LDAP_AUTH_BIND_BASE', default='')
 
@@ -447,14 +434,11 @@ LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
 LDAP_AUTH_FORMAT_SEARCH_FILTERS = "django_python3_ldap.utils.format_search_filters"
 
 LDAP_AUTH_OBJECT_CLASS = env('LDAP_AUTH_OBJECT_CLASS', default='')
-# LDAP_AUTH_OBJECT_CLASS = "organizationalPerson"
 LDAP_AUTH_USER_FIELDS = {
     "username": env('LDAP_AUTH_USER_FIELDS_USERNAME', default=''),
     "first_name": env('LDAP_AUTH_USER_FIELDS_FIRST_NAME', default=''),
     "last_name": env('LDAP_AUTH_USER_FIELDS_LAST_NAME', default=''),
     "email": env('LDAP_AUTH_USER_FIELDS_EMAIL', default=''),
-    #"matricula": env('LDAP_AUTH_USER_FIELDS_MATRICULA', default=''),
-    #"pessoa": env('LDAP_AUTH_USER_FIELDS_PESSOA', default=''),
     "lotado": env('LDAP_AUTH_USER_FIELDS_LOTADO', default=''),
     "chefia": env('LDAP_AUTH_USER_FIELDS_CHEFIA', default=''),
     "cpf": env('LDAP_AUTH_USER_FIELDS_CPF', default=''),
@@ -466,27 +450,10 @@ LDAP_AUTH_SYNC_USER_RELATIONS = "django_python3_ldap.utils.sync_user_relations"
 LDAP_AUTH_FORMAT_SEARCH_FILTERS = "django_python3_ldap.utils.format_search_filters"
 LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_active_directory"
 LDAP_ALWAYS_SEARCH_BIND = True
-# LDAP_AUTH_FORMAT_USERNAME = "django_python3_ldap.utils.format_username_openldap"
-#AUTH_LDAP_BIND_USER = "cn=authproxy,dc=cmc,dc=pr,dc=gov,dc=br"
-#AUTH_LDAP_BIND_PASSWORD = "authproxy"
-
-
-# LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "dc=cmc,dc=pr,dc=gov,dc=br"
-# LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "cmc.pr.gov.br"
-# LDAP_AUTH_CONNECTION_USERNAME = "cn=authproxy,dc=cmc,dc=pr,dc=gov,dc=br"
-# LDAP_AUTH_CONNECTION_PASSWORD = "authproxy"
-# LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "ECDC"
-# LDAP_AUTH_ACTIVE_DIRECTORY_DOMAIN = "cmc.pr.gov.br"
-
 LDAP_BIND_USERNAME = env('LDAP_BIND_USERNAME', default='')
 LDAP_BIND_PASSWORD = env('LDAP_BIND_PASSWORD', default='')
-
-
-
 LDAP_AUTH_CONNECT_TIMEOUT = None
 LDAP_AUTH_RECEIVE_TIMEOUT = None
-
-#X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 TINYMCE_SPELLCHECKER = True
 TINYMCE_COMPRESSOR = True
