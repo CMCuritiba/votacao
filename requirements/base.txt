@@ -31,7 +31,7 @@ six>=1.11.0
 
 sqlparse>=0.2.4
 
-https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.7.tar.gz
+https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.8.tar.gz
 
 django-python3-ldap==0.11.1
 django-ldapdb==1.0.0
