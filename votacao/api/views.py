@@ -329,6 +329,28 @@ def vota_contrario(request, tipo_voto, id_texto):
                 return response
             response = JsonResponse({'status':'true','message':'Votação contrária efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
     return response     
+    # -----------------------------------------------------------------------------------
+# chamada API para votar contrário com texto
+# -----------------------------------------------------------------------------------
+def vota_contrario_texto(request, tipo_voto, texto_contrario):
+    response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
+
+    if request.method == 'POST':
+        widget_json = {}
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        votacao = body['votacao']
+        if (votacao != None):
+            try:
+                votacao = Votacao.objects.get(id=votacao)
+                voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
+                restricao = Restricao.objects.create(voto=voto, restricao=texto_contrario)
+                logger.info("Voto %s por %s", tipo_voto, request.user.username)
+            except Votacao.DoesNotExist:
+                response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
+                return response
+            response = JsonResponse({'status':'true','message':'Votação contrária efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
+    return response     
 # -----------------------------------------------------------------------------------
 # chamada API para reiniciar votacao
 # -----------------------------------------------------------------------------------
