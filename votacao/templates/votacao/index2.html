@@ -116,7 +116,17 @@
       					</div>
       					<div class="modal-body">
         					<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
-        					<div id="div_combo_contrario"></div>
+        					<div id="div_combo_contrario">
+										<section v-if="temParecer">
+											<select id="combo_contrario" name="combo_contrario" style="padding:10px;">
+												<option v-for="option in pareceres" v-bind:value="option.id" v-text="option.valor">
+												</option>
+											</select>
+										</section>
+										<section v-else>
+											<textarea class="form-control col-xs-12" rows="10" maxlength="500" id="texto_contrario" name="texto_contrario" rows="5" cols="30"></textarea>
+										</section>
+									</div>
       					</div>
       					<div class="modal-footer">
         					<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalContrario">Cancelar</button>
@@ -136,6 +146,8 @@
 
 <script type="text/javascript">
 
+	var loaded = false;
+
 	var app = new Vue({
 		el: '#app',
 		delimiters: ["<%","%>"],
@@ -152,6 +164,10 @@
 				salvando: false,
 				errored: false,
 				votou: false,
+				loaded: false,
+				pareceres: [],
+				selected: 'One',
+				temParecer: false,
 				proposicao: {
 					codigo: null,
 					iniciativa: null,
@@ -162,7 +178,7 @@
 				voto: {
 					votacao_id: null,
 					tipo_voto: null
-				}
+				},
 			}
 		},
 		methods: {
@@ -176,9 +192,11 @@
 				this.modalContrario = false;
 			},
 			carregaDados() {
+				
 				axios
 				.get('/api/retorna_aberto/')
 				.then(response => {
+					// console.log(response.data)
 					if (response.data.length > 0) {
 						this.proposicao.codigo = response.data[0].codigo_proposicao;
 						this.proposicao.iniciativa = response.data[0].iniciativa;
@@ -187,10 +205,39 @@
 						this.proposicao.votado = response.data[0].votado;
 						this.voto.votacao_id = response.data[0].id;
 						this.voto.tipo_voto = response.data[0].tipo_voto;
-						this.aguardando = false;
 						this.votou = response.data[0].votado
-						verifica_contrario(this.proposicao.codigo);
+
+						this.loaded = true;
+
+						if (this.loaded) {
+							axios
+							.get('/api/textos_conclusao/' + this.proposicao.codigo + '/')
+							.then(res => {
+								if (res.data.length > 0) {
+										// console.log('TEM PARECER');
+										this.temParecer = true;
+										this.pareceres = [];
+										const pareceres = res.data;
+										pareceres.map(parecer => {
+											this.pareceres.push({
+												id: parecer.txt_id,
+												valor: parecer.vereador + ' - ' + parecer.tcp_nome,
+											});
+										});
+										
+                } else {
+									this.temParecer = false;
+									// console.log('NÃO TEM PARECER');
+								}
+							})
+							.catch(err => {
+								this.errored = true;
+								this.aguardando = false;
+							})
+						}
+						// verifica_contrario(this.proposicao.codigo);
 						this.salvando = false;
+						this.aguardando = false;
 					}
 					else {
 						this.aguardando = true;
@@ -202,134 +249,162 @@
 					this.errored = true;
 					this.aguardando = false;
 				})
-				.finally(() => this.carregando = false)
-    		},
-    		resultadoVoto() {
-	            if (this.voto.tipo_voto == 'F')
-	                return '<h2 class="text-success">FAVORÁVEL</h2>';
-	            else if (this.voto.tipo_voto == 'R')
-	                return '<h2 class="text-warning">FAVORÁVEL COM RESTRIÇÕES</h2>';
-	            else if (this.voto.tipo_voto == 'C')
-	                return '<h2 class="text-danger">CONTRÁRIO</h2>';
-	            else if (this.voto.tipo_voto == 'A')
-	                return '<h2 class="text-primary">ABSTENÇÃO</h2>';
-	            else if (this.voto.tipo_voto == 'V')
-	                return '<h2 class="text-info">VISTA</h2>';
-	            else
-	                return '<h2 class="text-danger">ERRO</h2>'
-        	}
-        	,
-        	votaFavoravel() {
-        		this.votoAgora = 'F';
-        		this.modalVoto = true;
-        		this.classeVoto = "text-success";
-        		this.descVoto = "FAVORÁVEL";
-        	},
-        	votaRestricoes() {
-        		this.votoAgora = 'R'
-        		this.modalRestricao = true;
-        		this.classeVoto = "text-warning";
-        		this.descVoto = "FAVORÁVEL COM RESTRIÇÕES";
-        	},
-        	votaContrario() {
-        		this.votoAgora = 'C'
-        		this.modalContrario = true;
-        		this.classeVoto = "text-danger";
-        		this.descVoto = "CONTRÁRIO";
-        	},
-        	votaAbstencao() {
-        		this.votoAgora = 'A'
-        		this.modalVoto = true;
-        		this.classeVoto = "text-primary";
-        		this.descVoto = "ABSTENÇÃO";
-        	},
-        	votaVista() {
-        		this.votoAgora = 'V'
-        		this.modalVoto = true;
-        		this.classeVoto = "text-info";
-        		this.descVoto = "VISTA";
-        	},
-        	vota() {
-        		if (this.votoAgora == 'R') {
-                    request_url = "/api/vota_restricao/" + this.votoAgora + "/" + this.restricao + "/";
-                    this.modalRestricao = false;
-                }
-                else if (this.votoAgora == 'C') {
-                    id_texto = $('#combo_contrario option:selected').val();
-                    request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
-                    this.modalContrario = false;
-                }
-                else if (this.votoAgora == 'F' || this.votoAgora == 'V' || this.votoAgora == 'A') {
-                    request_url = "/api/vota/" + this.votoAgora + "/";
-                    this.modalVoto = false;
-                }
+				.finally(() => {
+					this.carregando = false;
+				})
+    	},
+			resultadoVoto() {
+						if (this.voto.tipo_voto == 'F')
+								return '<h2 class="text-success">FAVORÁVEL</h2>';
+						else if (this.voto.tipo_voto == 'R')
+								return '<h2 class="text-warning">FAVORÁVEL COM RESTRIÇÕES</h2>';
+						else if (this.voto.tipo_voto == 'C')
+								return '<h2 class="text-danger">CONTRÁRIO</h2>';
+						else if (this.voto.tipo_voto == 'A')
+								return '<h2 class="text-primary">ABSTENÇÃO</h2>';
+						else if (this.voto.tipo_voto == 'V')
+								return '<h2 class="text-info">VISTA</h2>';
+						else
+								return '<h2 class="text-danger">ERRO</h2>'
+				},
+				votaFavoravel() {
+					this.votoAgora = 'F';
+					this.modalVoto = true;
+					this.classeVoto = "text-success";
+					this.descVoto = "FAVORÁVEL";
+				},
+				votaRestricoes() {
+					this.votoAgora = 'R'
+					this.modalRestricao = true;
+					this.classeVoto = "text-warning";
+					this.descVoto = "FAVORÁVEL COM RESTRIÇÕES";
+				},
+				votaContrario() {
+					this.votoAgora = 'C'
+					this.modalContrario = true;
+					this.classeVoto = "text-danger";
+					this.descVoto = "CONTRÁRIO";
+				},
+				votaAbstencao() {
+					this.votoAgora = 'A'
+					this.modalVoto = true;
+					this.classeVoto = "text-primary";
+					this.descVoto = "ABSTENÇÃO";
+				},
+				votaVista() {
+					this.votoAgora = 'V'
+					this.modalVoto = true;
+					this.classeVoto = "text-info";
+					this.descVoto = "VISTA";
+				},
+				vota() {
+					if (this.votoAgora == 'R') {
+									request_url = "/api/vota_restricao/" + this.votoAgora + "/" + this.restricao + "/";
+									this.modalRestricao = false;
+							}
+							else if (this.votoAgora == 'C') {
+									// id_texto = $('#combo_contrario option:selected').val();
+									// request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
+									tipo_contrario = $('#contrario_tipo').val();
+									if (this.temParecer) {
+										id_texto = $('#combo_contrario option:selected').val();
+										request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
+										// console.log(request_url);
+									} else if (!this.temParecer) {
+										texto_contrario = $('#texto_contrario').val();
+										request_url = "/api/vota_contrario_texto/" + this.votoAgora + "/" + texto_contrario + "/";
+										// console.log(request_url);
+									}
+									this.modalContrario = false;
+							}
+							else if (this.votoAgora == 'F' || this.votoAgora == 'V' || this.votoAgora == 'A') {
+									request_url = "/api/vota/" + this.votoAgora + "/";
+									this.modalVoto = false;
+							}
 
-                if (request_url != undefined) {
+							if (request_url != undefined) {
 
-                	this.salvando = true;
-                	this.token = '{{csrf_token}}';
+								this.salvando = true;
+								this.token = '{{csrf_token}}';
 
-                	var data = JSON.stringify({votacao:this.voto.votacao_id});
+								var data = JSON.stringify({votacao:this.voto.votacao_id});
 
 
-	                axios({
-	                	method: 'post',
-	                	url: request_url,
-	                	headers: {
-	                		"X-CSRFToken": this.token,
-	                		'Content-Type': 'application/x-www-form-urlencoded',
-	                		dataType: 'json',
-	                	},
-	                	data: data
-	                })
-	                .then(response => {
-	        	     	this.salvando = true;
-	                })
-	                .catch(error => {
-	                	this.salvando = false;
-	                })
-	            }
-        	}
+								axios({
+									method: 'post',
+									url: request_url,
+									headers: {
+										"X-CSRFToken": this.token,
+										'Content-Type': 'application/x-www-form-urlencoded',
+										dataType: 'json',
+									},
+									data: data
+								})
+								.then(response => {
+								this.salvando = true;
+								})
+								.catch(error => {
+									this.salvando = false;
+								})
+						}
+						this.loaded = false;
+				}
 		},
 		mounted() {
+			
 			this.carregaDados();
 			this.timer = setInterval(this.carregaDados, 5000);
+
 		}
 
 	})
 
-	function verifica_contrario(codigo_proposicao) {
-        request_url = '/api/textos_conclusao/' + codigo_proposicao + '/';
-        $.ajax({
-            url: request_url,
-            type: 'GET',
-            accepts: 'application/json',
-            dataType: 'json',
-            success: function(result){
-                //console.log(result);
-                if (result.length > 0) {
-                    //console.log("HABILITAR BOTAO CONTRARIO");
-                    $('#bt_contrario').attr("enabled","enabled");
-                    toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
-                    $.each(result, function(index, element) {
-                        toAppend += '<option value="' + element.txt_id + '">' + element.vereador + ' - ' + element.tcp_nome + '</option>';
-                    });
-                    toAppend += '</select>';
-                    //console.log(toAppend);
-                    $('#div_combo_contrario').empty();
-                    $('#div_combo_contrario').append(toAppend);
-                    $('.selectpicker').selectpicker();
-                }
-                else {
-                    //console.log("DESABILITAR BOTAO CONTRARIO");
-                    $('#bt_contrario').attr("disabled","disabled");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log('Problema ao carregar informações do projeto.');
-            }
-        })
-    }
+	// function verifica_contrario(codigo_proposicao) {
+  //       request_url = '/api/textos_conclusao/' + codigo_proposicao + '/';
+  //       $.ajax({
+  //           url: request_url,
+  //           type: 'GET',
+  //           accepts: 'application/json',
+  //           dataType: 'json',
+  //           success: function(result){
+  //               //console.log(result);
+  //               if (result.length > 0) {
+	// 									console.log('TEM PARECER');
+  //                   //console.log("HABILITAR BOTAO CONTRARIO");
+  //                   $('#bt_contrario').attr("enabled","enabled");
+  //                   toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
+  //                   $.each(result, function(index, element) {
+  //                       toAppend += '<option value="' + element.txt_id + '">' + element.vereador + ' - ' + element.tcp_nome + '</option>';
+  //                   });
+  //                   toAppend += '</select>';
+	// 									toAppend += '<input type="hidden" id="contrario_tipo" name="contrario_tipo" value="COM_PARECER" />'
+  //                   //console.log(toAppend);
+	// 									console.log(loaded);
+	// 									if (!loaded) {
+	// 									$('#div_combo_contrario').empty();
+	// 									$('#div_combo_contrario').append(toAppend);
+	// 									}
+	// 									// $('.selectpicker').selectpicker();
+  //               } else {
+	// 								$('#texto_contrario').css("display", "block");
+	// 								console.log('NÃO TEM PARECER');
+	// 							}
+	// 							// loaded = true;
+  //               // else {
+  //               //     //console.log("DESABILITAR BOTAO CONTRARIO");
+  //               //     // $('#bt_contrario').attr("disabled","disabled");
+	// 							// 		toAppend = '<input type="hidden" id="contrario_tipo" name="contrario_tipo" value="SEM_PARECER" />';
+	// 							// 		toAppend += '<textarea class="form-control col-xs-12" rows="10" id="texto_contrario" name="texto_contrario" v-model="texto_contrario" rows="5" cols="30" />'
+	// 							// 		$('#div_combo_contrario').empty();
+	// 							// 		$('#div_combo_contrario').append(toAppend);
+  //               // }
+	// 							loaded = true;
+  //           },
+  //           error: function(xhr, status, error) {
+  //               console.log('Problema ao carregar informações do projeto.');
+  //           }
+  //       })
+  //   }
 
 </script>	
 {% endblock %}

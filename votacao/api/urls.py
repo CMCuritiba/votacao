@@ -23,6 +23,7 @@ urlpatterns = [
 	path('relatorio_votacao/<int:pac_id>/', views.relatorio_votacao, name='relatorio-votacao'),
 	path('textos_conclusao/<pro_codigo>/', views.consome_textos_conclusao, name='textos-conclusao'),
 	path('vota_contrario/<tipo_voto>/<id_texto>/', views.vota_contrario, name='vota-contrario'),
+	path('vota_contrario_texto/<tipo_voto>/<texto_contrario>/', views.vota_contrario_texto, name='vota-contrario-texto'),
 	path('reinicia_votacao/', views.reinicia_votacao, name='reinicia-votacao'),
 	path('monta_painel/<int:pac_id>/<int:par_id>/<codigo_projeto>/', views.monta_painel, name='monta_painel'),
 	path('usuarios/', views.usuarios, name='usuarios'),
