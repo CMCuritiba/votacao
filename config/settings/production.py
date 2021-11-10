@@ -17,7 +17,7 @@ from .base import *  # noqa
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
 SECRET_KEY = env('SECRET_KEY_PROD', default='')
-DEBUG=True
+DEBUG=False
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
