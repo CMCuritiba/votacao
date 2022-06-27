@@ -74,7 +74,7 @@ https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-co
 # Relatorios
 xhtml2pdf
 django-easy-pdf==0.1.1
-reportlab==3.5.23
+reportlab==3.5.55
 
 # Json
 jsonref
