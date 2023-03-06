@@ -416,7 +416,7 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
                 iniciativa = projeto[0]['iniciativa']
                 sumula = projeto[0]['sumula']
                 relator = projeto[0]['relator']
-                conclusao = projeto[0]['conclusao_comissao']
+                conclusao = projeto[0]['conclusao_relator']
 
                 try:
                     votacao_banco = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
