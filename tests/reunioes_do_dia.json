@@ -1,0 +1,35 @@
+[
+  {
+    "rec_data": "27/09/2023",
+    "versao": 1,
+    "con_sigla": "C.Meio Ambiente",
+    "con_desc": "Comissão de Meio Ambiente, Desenvolvimento Sustentável e Assuntos Metropolitanos",
+    "rec_numero": "9ª, 8:15h, Sala das Comissões",
+    "rec_tipo_reuniao": "Ordinária",
+    "pac_id": 1756,
+    "con_id": 9066,
+    "rec_id": 4072
+  },
+  {
+    "rec_data": "27/09/2023",
+    "versao": 1,
+    "con_sigla": "C.Economia",
+    "con_desc": "Comissão de Economia, Finanças e Fiscalização",
+    "rec_numero": "24ª, Após plenário, Sala das Comissões ",
+    "rec_tipo_reuniao": "Ordinária",
+    "pac_id": 1763,
+    "con_id": 69,
+    "rec_id": 4078
+  },
+  {
+    "rec_data": "27/09/2023",
+    "versao": 1,
+    "con_sigla": "C.Educação",
+    "con_desc": "Comissão de Educação, Turismo, Cultura, Esporte e Lazer",
+    "rec_numero": "11ª, às 14h, na Sala das Comissões",
+    "rec_tipo_reuniao": "Ordinária",
+    "pac_id": 1761,
+    "con_id": 13965,
+    "rec_id": 4075
+  }
+]

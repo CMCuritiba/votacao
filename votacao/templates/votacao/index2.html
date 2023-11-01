@@ -11,47 +11,59 @@
 </section>
 <section v-else>
 	<div v-if="aguardando" class="jumbotron text-center">
-    	<h1>Aguardando liberação para votação</h1>
+		<h1>Aguardando liberação para votação</h1>
 	</div>
 	<div v-else>
 		<div id="pnl_projeto" class="panel panel-primary">
-	   	<div id="projeto" class="panel-heading"><h3><% proposicao.codigo %></h3></div>
-	        <div class="panel-body">
-	            <div class="row">
-	                <div class="col-sm-12">
-	                    <h3 id="iniciativa">Iniciativa: <% proposicao.iniciativa %></h3>
-	                </div>
-	            </div>
-	            <div class="row">
-	                <div class="col-sm-12">
-	                    <h4 id="ementa"><% proposicao.sumula %></h4>
-	                </div>
-	            </div>
-	            <div class="row">
-	                <div class="col-sm-12">
-	                    <h4 id="conclusao">Conclusão: <% proposicao.conclusao_relator %></h4>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
+			<div id="projeto" class="panel-heading">
+				<h3>
+					<% proposicao.codigo %>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-sm-12">
+						<h3 id="iniciativa">Iniciativa: <% proposicao.iniciativa %>
+						</h3>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<h4 id="ementa">
+							<% proposicao.sumula %>
+						</h4>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<h4 id="conclusao">Conclusão: <% proposicao.conclusao_relator %>
+						</h4>
+					</div>
+				</div>
+			</div>
+		</div>
 
-	    <div v-if="votou" class="jumbotron text-center">
-	    	<h1>Voto realizado com sucesso.</h1><br/>
-	    	<h2>Vereador {{ user.get_full_name }} votou: </h2><div v-html="resultadoVoto()"></div>
-	    </div>
-	    <div v-else-if="salvando" class="jumbotron text-center">
-	    	<h1>Registrando voto...</h1><img src="{% static 'images/ajax-loader.gif' %}"><br/>
-	    </div>
-	    <div id="dbotoes" v-else class="jumbotron text-center">
-	    	<button type="button" id="bt_favoravel" class="btn btn-success btn-lg botao" v-on:click="votaFavoravel"> FAVORÁVEL </button>
-	    	<button type="button" class="btn btn-warning btn-lg botao" v-on:click="votaRestricoes"> FAVORÁVEL COM RESTRIÇÕES </button>
-	    	<button type="button" id="bt_contrario" class="btn btn-danger btn-lg botao" v-on:click="votaContrario"> CONTRÁRIO </button>
-	    	<button type="button" class="btn btn-primary btn-lg botao" v-on:click="votaAbstencao"> ABSTENÇÃO </button>
-	    	<button type="button" class="btn btn-info btn-lg botao" v-on:click="votaVista"> VISTA </button>
-	    </div>
-    	
+		<div v-if="votou" class="jumbotron text-center">
+			<h1>Voto realizado com sucesso.</h1><br />
+			<h2>Vereador {{ user.get_full_name }} votou: </h2>
+			<div v-html="resultadoVoto()"></div>
+		</div>
+		<div v-else-if="salvando" class="jumbotron text-center">
+			<h1>Registrando voto...</h1><img src="{% static 'images/ajax-loader.gif' %}"><br />
+		</div>
+		<div id="dbotoes" v-else class="jumbotron text-center">
+			<button type="button" id="bt_favoravel" class="btn btn-success btn-lg botao" v-on:click="votaFavoravel"> FAVORÁVEL
+			</button>
+			<button type="button" class="btn btn-warning btn-lg botao" v-on:click="votaRestricoes"> FAVORÁVEL COM RESTRIÇÕES
+			</button>
+			<button type="button" id="bt_contrario" class="btn btn-danger btn-lg botao" v-on:click="votaContrario"> CONTRÁRIO
+			</button>
+			<button type="button" class="btn btn-primary btn-lg botao" v-on:click="votaAbstencao"> ABSTENÇÃO </button>
+			<button type="button" class="btn btn-info btn-lg botao" v-on:click="votaVista"> VISTA </button>
+		</div>
+
 	</div>
-</div>
+	</div>
 	</div>
 </section>
 
@@ -60,20 +72,21 @@
 	<transition name="modal">
 		<div class="modal-mask">
 			<div class="modal-wrapper">
-	  			<div class="modal-dialog modal-lg" role="document">
-	    			<div class="modal-content">
-	      				<div class="modal-header">
-	        				<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
-	      				</div>
-	      				<div class="modal-body">
-	        				<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
-	      				</div>
-	      				<div class="modal-footer">
-	        				<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalVoto">Cancelar</button>
-	        				<button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao" v-on:click="vota">Confirma</button>
-	      				</div>
-	    			</div>
-	  			</div>
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+						</div>
+						<div class="modal-body">
+							<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalVoto">Cancelar</button>
+							<button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao"
+								v-on:click="vota">Confirma</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</transition>
@@ -84,21 +97,22 @@
 	<transition name="modal">
 		<div class="modal-mask">
 			<div class="modal-wrapper">
-  				<div class="modal-dialog modal-lg">
-    				<div class="modal-content">
-      					<div class="modal-header">
-        					<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
-      					</div>
-      					<div class="modal-body">
-        					<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
-        					<textarea class="form-control col-xs-12" rows="10" id="restricao" v-model="restricao"></textarea>
-      					</div>
-      					<div class="modal-footer">
-        					<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalRestricao">Cancelar</button>
-        					<button type="button" class="btn btn-primary btn-lg" v-on:click="vota">Confirma</button>
-      					</div>
-    				</div>
-  				</div>
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+						</div>
+						<div class="modal-body">
+							<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
+							<textarea class="form-control col-xs-12" rows="5" id="restricao" v-model="restricao"
+								style="resize: none; margin-bottom: 2rem;"></textarea>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalRestricao">Cancelar</button>
+							<button type="button" class="btn btn-primary btn-lg" v-on:click="vota">Confirma</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</transition>
@@ -109,40 +123,45 @@
 	<transition name="modal">
 		<div class="modal-mask">
 			<div class="modal-wrapper">
-  				<div class="modal-dialog modal-lg" role="document">
-    				<div class="modal-content">
-      					<div class="modal-header">
-        					<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
-      					</div>
-      					<div class="modal-body">
-        					<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
-        					<div id="div_combo_contrario">
-										<section v-if="temParecer">
-											<select id="combo_contrario" name="combo_contrario" style="padding:10px;">
-												<option v-for="option in pareceres" v-bind:value="option.id" v-text="option.valor">
-												</option>
-											</select>
-										</section>
-										<section v-else>
-											<textarea class="form-control col-xs-12" rows="10" maxlength="500" id="texto_contrario" name="texto_contrario" rows="5" cols="30"></textarea>
-										</section>
-									</div>
-      					</div>
-      					<div class="modal-footer">
-        					<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalContrario">Cancelar</button>
-        					<button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao" v-on:click="vota">Confirma</button>
-      					</div>
-    				</div>
-  				</div>
+				<div class="modal-dialog modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title" id="exampleModalLabel">Confirmação</h1>
+						</div>
+						<div class="modal-body">
+							<h2><b>Por favor, confirme o seu voto <span :class="classeVoto" v-html="descVoto"></span></b></h2>
+							<div id="div_combo_contrario">
+								<section v-if="temParecer">
+									<select id="combo_contrario" name="combo_contrario" style="padding:10px;">
+										<option v-for="option in pareceres" v-bind:value="option.id" v-text="option.valor">
+										</option>
+									</select>
+								</section>
+								<section v-else>
+									<textarea class="form-control col-xs-12" maxlength="500" id="texto_contrario" name="texto_contrario"
+										rows="5" cols="30" style="resize: none; margin-bottom: 2rem;"></textarea>
+								</section>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default btn-lg" v-on:click="fechaModalContrario">Cancelar</button>
+							<button type="button" class="btn btn-primary btn-lg" id="confirmaVotacao"
+								v-on:click="vota">Confirma</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</transition>
-</div>			
+</div>
 
 
 {% endblock content %}
 
 {% block extra_javascript %}
+
+<!-- ####### RETIRAR ANTES DE PROD ####### -->
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.6/vue.min.js"></script> -->
 
 <script type="text/javascript">
 
@@ -150,7 +169,7 @@
 
 	var app = new Vue({
 		el: '#app',
-		delimiters: ["<%","%>"],
+		delimiters: ["<%", "%>"],
 		data() {
 			return {
 				votoAgora: null,
@@ -166,6 +185,7 @@
 				votou: false,
 				loaded: false,
 				pareceres: [],
+				pareceresRaw: [],
 				selected: 'One',
 				temParecer: false,
 				proposicao: {
@@ -192,166 +212,210 @@
 				this.modalContrario = false;
 			},
 			carregaDados() {
-				
+
 				axios
-				.get('/api/retorna_aberto/')
-				.then(response => {
-					// console.log(response.data)
-					if (response.data.length > 0) {
-						this.proposicao.codigo = response.data[0].codigo_proposicao;
-						this.proposicao.iniciativa = response.data[0].iniciativa;
-						this.proposicao.sumula = response.data[0].sumula;
-						this.proposicao.conclusao_relator = response.data[0].conclusao_relator;
-						this.proposicao.votado = response.data[0].votado;
-						this.voto.votacao_id = response.data[0].id;
-						this.voto.tipo_voto = response.data[0].tipo_voto;
-						this.votou = response.data[0].votado
+					.get('/api/retorna_aberto/')
+					.then(response => {
+						// console.log(response.data)
+						if (response.data.length > 0) {
+							this.proposicao.codigo = response.data[0].codigo_proposicao;
+							this.proposicao.iniciativa = response.data[0].iniciativa;
+							this.proposicao.sumula = response.data[0].sumula;
+							this.proposicao.conclusao_relator = response.data[0].conclusao_relator;
+							this.proposicao.votado = response.data[0].votado;
+							this.voto.votacao_id = response.data[0].id;
+							this.voto.tipo_voto = response.data[0].tipo_voto;
+							this.votou = response.data[0].votado
 
-						this.loaded = true;
+							this.loaded = true;
 
-						if (this.loaded) {
-							axios
-							.get('/api/textos_conclusao/' + this.proposicao.codigo + '/')
-							.then(res => {
-								if (res.data.length > 0) {
-										// console.log('TEM PARECER');
-										this.temParecer = true;
-										this.pareceres = [];
-										const pareceres = res.data;
-										pareceres.map(parecer => {
-											this.pareceres.push({
-												id: parecer.txt_id,
-												valor: parecer.vereador + ' - ' + parecer.tcp_nome,
+							if (this.loaded) {
+								axios
+									.get('/api/textos_conclusao/' + this.proposicao.codigo + '/')
+									.then(res => {
+										if (res.data.length > 0) {
+											// console.log('TEM PARECER');
+											this.temParecer = true;
+											this.pareceres = [];
+											this.pareceresRaw = [];
+											const pareceres = res.data;
+											pareceres.map(parecer => {
+												this.pareceres.push({
+													id: parecer.txt_id,
+													valor: parecer.vereador + ' - ' + parecer.tcp_nome,
+												});
+
+												this.pareceresRaw.push({
+													txt_id: parecer.txt_id,
+													vereador: parecer.vereador,
+													tcp_nome: parecer.tcp_nome,
+												});
 											});
-										});
-										
-                } else {
-									this.temParecer = false;
-									// console.log('NÃO TEM PARECER');
-								}
-							})
-							.catch(err => {
-								this.errored = true;
-								this.aguardando = false;
-							})
+
+										} else {
+											this.temParecer = false;
+											// console.log('NÃO TEM PARECER');
+
+											// TEST
+											// this.temParecer = true;
+											// this.pareceres = [];
+											// this.pareceresRaw = [];
+											// const pareceres = [
+											// 	{
+											// 		"par_finalizado": false,
+											// 		"ver_id": 11677,
+											// 		"txt_finalizado": true,
+											// 		"tcp_nome": "Pela tramitação",
+											// 		"txt_data": "26/09/2023",
+											// 		"tcp_id": 1,
+											// 		"txt_id": 40272,
+											// 		"pro_id": 488719,
+											// 		"pro_codigo": "005.00167.2023",
+											// 		"vereador": "Jornalista Márcio Barros",
+											// 		"txt_relator": false,
+											// 		"par_id": 33027,
+											// 		"con_id": 69
+											// 	}];
+											// pareceres.map(parecer => {
+											// 	this.pareceres.push({
+											// 		id: parecer.txt_id,
+											// 		valor: parecer.vereador + ' - ' + parecer.tcp_nome,
+											// 	});
+
+											// 	this.pareceresRaw.push({
+											// 		txt_id: parecer.txt_id,
+											// 		vereador: parecer.vereador,
+											// 		tcp_nome: parecer.tcp_nome,
+											// 	});
+											// });
+										}
+									})
+									.catch(err => {
+										this.errored = true;
+										this.aguardando = false;
+									})
+							}
+							// verifica_contrario(this.proposicao.codigo);
+							this.salvando = false;
+							this.aguardando = false;
 						}
-						// verifica_contrario(this.proposicao.codigo);
-						this.salvando = false;
+						else {
+							this.aguardando = true;
+							this.salvando = false;
+						}
+					})
+					.catch(error => {
+						console.log(error);
+						this.errored = true;
 						this.aguardando = false;
-					}
-					else {
-						this.aguardando = true;
-						this.salvando = false;
-					}
-				})
-				.catch(error => {
-					console.log(error);
-					this.errored = true;
-					this.aguardando = false;
-				})
-				.finally(() => {
-					this.carregando = false;
-				})
-    	},
+					})
+					.finally(() => {
+						this.carregando = false;
+					})
+			},
 			resultadoVoto() {
-						if (this.voto.tipo_voto == 'F')
-								return '<h2 class="text-success">FAVORÁVEL</h2>';
-						else if (this.voto.tipo_voto == 'R')
-								return '<h2 class="text-warning">FAVORÁVEL COM RESTRIÇÕES</h2>';
-						else if (this.voto.tipo_voto == 'C')
-								return '<h2 class="text-danger">CONTRÁRIO</h2>';
-						else if (this.voto.tipo_voto == 'A')
-								return '<h2 class="text-primary">ABSTENÇÃO</h2>';
-						else if (this.voto.tipo_voto == 'V')
-								return '<h2 class="text-info">VISTA</h2>';
-						else
-								return '<h2 class="text-danger">ERRO</h2>'
-				},
-				votaFavoravel() {
-					this.votoAgora = 'F';
-					this.modalVoto = true;
-					this.classeVoto = "text-success";
-					this.descVoto = "FAVORÁVEL";
-				},
-				votaRestricoes() {
-					this.votoAgora = 'R'
-					this.modalRestricao = true;
-					this.classeVoto = "text-warning";
-					this.descVoto = "FAVORÁVEL COM RESTRIÇÕES";
-				},
-				votaContrario() {
-					this.votoAgora = 'C'
-					this.modalContrario = true;
-					this.classeVoto = "text-danger";
-					this.descVoto = "CONTRÁRIO";
-				},
-				votaAbstencao() {
-					this.votoAgora = 'A'
-					this.modalVoto = true;
-					this.classeVoto = "text-primary";
-					this.descVoto = "ABSTENÇÃO";
-				},
-				votaVista() {
-					this.votoAgora = 'V'
-					this.modalVoto = true;
-					this.classeVoto = "text-info";
-					this.descVoto = "VISTA";
-				},
-				vota() {
-					if (this.votoAgora == 'R') {
-									request_url = "/api/vota_restricao/" + this.votoAgora + "/" + this.restricao + "/";
-									this.modalRestricao = false;
-							}
-							else if (this.votoAgora == 'C') {
-									// id_texto = $('#combo_contrario option:selected').val();
-									// request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
-									tipo_contrario = $('#contrario_tipo').val();
-									if (this.temParecer) {
-										id_texto = $('#combo_contrario option:selected').val();
-										request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
-										// console.log(request_url);
-									} else if (!this.temParecer) {
-										texto_contrario = $('#texto_contrario').val();
-										request_url = "/api/vota_contrario_texto/" + this.votoAgora + "/" + texto_contrario + "/";
-										// console.log(request_url);
-									}
-									this.modalContrario = false;
-							}
-							else if (this.votoAgora == 'F' || this.votoAgora == 'V' || this.votoAgora == 'A') {
-									request_url = "/api/vota/" + this.votoAgora + "/";
-									this.modalVoto = false;
-							}
-
-							if (request_url != undefined) {
-
-								this.salvando = true;
-								this.token = '{{csrf_token}}';
-
-								var data = JSON.stringify({votacao:this.voto.votacao_id});
-
-
-								axios({
-									method: 'post',
-									url: request_url,
-									headers: {
-										"X-CSRFToken": this.token,
-										'Content-Type': 'application/x-www-form-urlencoded',
-										dataType: 'json',
-									},
-									data: data
-								})
-								.then(response => {
-								this.salvando = true;
-								})
-								.catch(error => {
-									this.salvando = false;
-								})
-						}
-						this.loaded = false;
+				if (this.voto.tipo_voto == 'F')
+					return '<h2 class="text-success">FAVORÁVEL</h2>';
+				else if (this.voto.tipo_voto == 'R')
+					return '<h2 class="text-warning">FAVORÁVEL COM RESTRIÇÕES</h2>';
+				else if (this.voto.tipo_voto == 'C')
+					return '<h2 class="text-danger">CONTRÁRIO</h2>';
+				else if (this.voto.tipo_voto == 'A')
+					return '<h2 class="text-primary">ABSTENÇÃO</h2>';
+				else if (this.voto.tipo_voto == 'V')
+					return '<h2 class="text-info">VISTA</h2>';
+				else
+					return '<h2 class="text-danger">ERRO</h2>'
+			},
+			votaFavoravel() {
+				this.votoAgora = 'F';
+				this.modalVoto = true;
+				this.classeVoto = "text-success";
+				this.descVoto = "FAVORÁVEL";
+			},
+			votaRestricoes() {
+				this.votoAgora = 'R'
+				this.modalRestricao = true;
+				this.classeVoto = "text-warning";
+				this.descVoto = "FAVORÁVEL COM RESTRIÇÕES";
+			},
+			votaContrario() {
+				this.votoAgora = 'C'
+				this.modalContrario = true;
+				this.classeVoto = "text-danger";
+				this.descVoto = "CONTRÁRIO";
+			},
+			votaAbstencao() {
+				this.votoAgora = 'A'
+				this.modalVoto = true;
+				this.classeVoto = "text-primary";
+				this.descVoto = "ABSTENÇÃO";
+			},
+			votaVista() {
+				this.votoAgora = 'V'
+				this.modalVoto = true;
+				this.classeVoto = "text-info";
+				this.descVoto = "VISTA";
+			},
+			vota() {
+				if (this.votoAgora == 'R') {
+					request_url = "/api/vota_restricao/" + this.votoAgora + "/" + this.restricao + "/";
+					this.modalRestricao = false;
 				}
+				else if (this.votoAgora == 'C') {
+					// id_texto = $('#combo_contrario option:selected').val();
+					// request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
+					tipo_contrario = $('#contrario_tipo').val();
+					if (this.temParecer) {
+						// console.log('PARECERES', this.pareceresRaw);
+						id_texto = $('#combo_contrario option:selected').val();
+						const parecerFound = this.pareceresRaw.find((parecerRaw) => parecerRaw.id_texto = id_texto);
+						// console.log('PARECERFOUND', parecerFound);
+						// request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/";
+						request_url = "/api/vota_contrario/" + this.votoAgora + "/" + id_texto + "/" + parecerFound.tcp_nome + "/" + parecerFound.vereador + "/";
+						// console.log(request_url);
+					} else if (!this.temParecer) {
+						texto_contrario = $('#texto_contrario').val();
+						request_url = "/api/vota_contrario_texto/" + this.votoAgora + "/" + texto_contrario + "/";
+						// console.log(request_url);
+					}
+					this.modalContrario = false;
+				}
+				else if (this.votoAgora == 'F' || this.votoAgora == 'V' || this.votoAgora == 'A') {
+					request_url = "/api/vota/" + this.votoAgora + "/";
+					this.modalVoto = false;
+				}
+
+				if (request_url != undefined) {
+
+					this.salvando = true;
+					this.token = '{{csrf_token}}';
+
+					var data = JSON.stringify({ votacao: this.voto.votacao_id });
+
+
+					axios({
+						method: 'post',
+						url: request_url,
+						headers: {
+							"X-CSRFToken": this.token,
+							'Content-Type': 'application/x-www-form-urlencoded',
+							dataType: 'json',
+						},
+						data: data
+					})
+						.then(response => {
+							this.salvando = true;
+						})
+						.catch(error => {
+							this.salvando = false;
+						})
+				}
+				this.loaded = false;
+			}
 		},
 		mounted() {
-			
+
 			this.carregaDados();
 			this.timer = setInterval(this.carregaDados, 5000);
 
@@ -360,51 +424,51 @@
 	})
 
 	// function verifica_contrario(codigo_proposicao) {
-  //       request_url = '/api/textos_conclusao/' + codigo_proposicao + '/';
-  //       $.ajax({
-  //           url: request_url,
-  //           type: 'GET',
-  //           accepts: 'application/json',
-  //           dataType: 'json',
-  //           success: function(result){
-  //               //console.log(result);
-  //               if (result.length > 0) {
+	//       request_url = '/api/textos_conclusao/' + codigo_proposicao + '/';
+	//       $.ajax({
+	//           url: request_url,
+	//           type: 'GET',
+	//           accepts: 'application/json',
+	//           dataType: 'json',
+	//           success: function(result){
+	//               //console.log(result);
+	//               if (result.length > 0) {
 	// 									console.log('TEM PARECER');
-  //                   //console.log("HABILITAR BOTAO CONTRARIO");
-  //                   $('#bt_contrario').attr("enabled","enabled");
-  //                   toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
-  //                   $.each(result, function(index, element) {
-  //                       toAppend += '<option value="' + element.txt_id + '">' + element.vereador + ' - ' + element.tcp_nome + '</option>';
-  //                   });
-  //                   toAppend += '</select>';
+	//                   //console.log("HABILITAR BOTAO CONTRARIO");
+	//                   $('#bt_contrario').attr("enabled","enabled");
+	//                   toAppend = '<select id="combo_contrario" name="combo_contrario" class="selectpicker" data-width="50%">';
+	//                   $.each(result, function(index, element) {
+	//                       toAppend += '<option value="' + element.txt_id + '">' + element.vereador + ' - ' + element.tcp_nome + '</option>';
+	//                   });
+	//                   toAppend += '</select>';
 	// 									toAppend += '<input type="hidden" id="contrario_tipo" name="contrario_tipo" value="COM_PARECER" />'
-  //                   //console.log(toAppend);
+	//                   //console.log(toAppend);
 	// 									console.log(loaded);
 	// 									if (!loaded) {
 	// 									$('#div_combo_contrario').empty();
 	// 									$('#div_combo_contrario').append(toAppend);
 	// 									}
 	// 									// $('.selectpicker').selectpicker();
-  //               } else {
+	//               } else {
 	// 								$('#texto_contrario').css("display", "block");
 	// 								console.log('NÃO TEM PARECER');
 	// 							}
 	// 							// loaded = true;
-  //               // else {
-  //               //     //console.log("DESABILITAR BOTAO CONTRARIO");
-  //               //     // $('#bt_contrario').attr("disabled","disabled");
+	//               // else {
+	//               //     //console.log("DESABILITAR BOTAO CONTRARIO");
+	//               //     // $('#bt_contrario').attr("disabled","disabled");
 	// 							// 		toAppend = '<input type="hidden" id="contrario_tipo" name="contrario_tipo" value="SEM_PARECER" />';
 	// 							// 		toAppend += '<textarea class="form-control col-xs-12" rows="10" id="texto_contrario" name="texto_contrario" v-model="texto_contrario" rows="5" cols="30" />'
 	// 							// 		$('#div_combo_contrario').empty();
 	// 							// 		$('#div_combo_contrario').append(toAppend);
-  //               // }
+	//               // }
 	// 							loaded = true;
-  //           },
-  //           error: function(xhr, status, error) {
-  //               console.log('Problema ao carregar informações do projeto.');
-  //           }
-  //       })
-  //   }
+	//           },
+	//           error: function(xhr, status, error) {
+	//               console.log('Problema ao carregar informações do projeto.');
+	//           }
+	//       })
+	//   }
 
-</script>	
+</script>
 {% endblock %}
