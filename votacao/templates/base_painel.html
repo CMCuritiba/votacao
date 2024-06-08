@@ -1,22 +1,24 @@
 <!doctype html>
 <html lang="pt-BR">
-    <head>
-        {% load pipeline %}
-        {% load votacao_extras %}
 
-        {% stylesheet 'master' %}
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    </head>
+<head>
+    {% load pipeline %}
+    {% load votacao_extras %}
 
-    <body>
+    {% stylesheet 'master' %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
 
     <div id="app">
         <div class="container">
-            
+
             <div class="starter-template">
                 <div id="componentes">
-                    <cabecalho titulo="Painel de Votação" urljson="{% settings_value 'MSCMC_SERVER' %}/api/misc/connection/"></cabecalho>
+                    <cabecalho titulo="Painel de Votação"
+                        urljson="{% settings_value 'MSCMC_SERVER' %}/api/misc/connection/"></cabecalho>
                 </div>
 
                 {% block content %}{% endblock content %}
@@ -31,6 +33,6 @@
 
     {% endblock %}
 
-  </body>
-</html>
+</body>
 
+</html>

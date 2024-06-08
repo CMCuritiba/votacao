@@ -12,7 +12,7 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 
 from votacao.votacao.forms import JSONVotacaoForm
-from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario, Restricao
+from votacao.votacao.models import Votacao, Voto, Restricao, VotoContrario, Restricao, VotoContrarioComplemento
 from votacao.api.util.json_util import ReuniaoJSON, VotacaoJSON, VotoJSON, TotalJSON, JsonConvert, PainelVotacaoJSON
 from votacao.api.util.db_util import verifica
 
@@ -280,6 +280,13 @@ def relatorio_votacao(request, pac_id):
                 if voto.voto == 'F':
                     tot_favoravel += 1
                 elif voto.voto == 'C':
+                    try: 
+                        voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
+                        voto_contrario_complemento = VotoContrarioComplemento.objects.get(voto_contrario_id=voto_contrario.id)
+                        desc_contrario = voto_contrario_complemento.vereador + " - " + voto_contrario_complemento.tcp_nome
+                    except VotoContrario.DoesNotExist:
+                            restricao = Restricao.objects.get(voto_id=voto.id)
+                            desc_contrario = "COM RESTRIÇÕES - " + restricao.restricao
                     tot_contrario += 1
                 elif voto.voto == 'R':
                     tot_favoravel_restricoes += 1
@@ -289,7 +296,8 @@ def relatorio_votacao(request, pac_id):
                     tot_abstencao += 1
                 elif voto.voto == 'V':
                     tot_vista += 1
-                votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, desc_restricao))
+                # votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, desc_restricao))
+                votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, '', desc_contrario))
             votacao_incluir.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
         reuniao_js.VotacaoJSONs.append(votacao_incluir)     
 
@@ -297,7 +305,7 @@ def relatorio_votacao(request, pac_id):
     fromJson = JsonConvert.FromJSON(asJson)
     asJsonFromJson = JsonConvert.ToJSON(fromJson)
     data = jsonref.loads(asJson)
-    #print(data)
+    # print(data)
     return data
 
 # -----------------------------------------------------------------------------------
@@ -310,7 +318,7 @@ def consome_textos_conclusao(request, pro_codigo):
 # -----------------------------------------------------------------------------------
 # chamada API para votar contrário
 # -----------------------------------------------------------------------------------
-def vota_contrario(request, tipo_voto, id_texto):
+def vota_contrario(request, tipo_voto, id_texto, tcp_nome, vereador):
     response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
 
     if request.method == 'POST':
@@ -323,13 +331,14 @@ def vota_contrario(request, tipo_voto, id_texto):
                 votacao = Votacao.objects.get(id=votacao)
                 voto = Voto.objects.create(votacao=votacao, vereador=request.user, voto=tipo_voto)
                 contrario = VotoContrario.objects.create(voto=voto, id_texto=id_texto)
+                complemento = VotoContrarioComplemento.objects.create(voto_contrario=contrario, tcp_nome=tcp_nome, vereador=vereador)
                 logger.info("Voto %s por %s", tipo_voto, request.user.username)
             except Votacao.DoesNotExist:
                 response = JsonResponse({'status':'false','message':'Erro ao tentar votar contrário.'}, status=404)
                 return response
             response = JsonResponse({'status':'true','message':'Votação contrária efetuada com sucesso', 'tipo_voto': tipo_voto}, status=200)
     return response     
-    # -----------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------
 # chamada API para votar contrário com texto
 # -----------------------------------------------------------------------------------
 def vota_contrario_texto(request, tipo_voto, texto_contrario):
@@ -427,9 +436,17 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
                 #votacao = PainelVotacaoJSON(codigo_proposicao, relator, iniciativa, sumula, conclusao, votacao_banco.status, ini_nome)
 
                 for voto in votacao_banco.lista_votos():
+                    desc_contrario = ''
                     if voto.voto == 'F':
                         tot_favoravel += 1
                     elif voto.voto == 'C':
+                        try: 
+                            voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
+                            voto_contrario_complemento = VotoContrarioComplemento.objects.get(voto_contrario_id=voto_contrario.id)
+                            desc_contrario = voto_contrario_complemento.vereador + " - " + voto_contrario_complemento.tcp_nome
+                        except VotoContrario.DoesNotExist:
+                            restricao = Restricao.objects.get(voto_id=voto.id)
+                            desc_contrario = "COM RESTRIÇÕES - " + restricao.restricao
                         tot_contrario += 1
                     elif voto.voto == 'R':
                         tot_favoravel_restricoes += 1
@@ -437,7 +454,7 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
                         tot_abstencao += 1
                     elif voto.voto == 'V':
                         tot_vista += 1
-                    votacao.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto))
+                    votacao.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, '', desc_contrario))
                 votacao.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
                 asJson = JsonConvert.ToJSON(votacao)
                 fromJson = JsonConvert.FromJSON(asJson)

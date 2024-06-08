@@ -1,85 +1,120 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="UTF-8">
+
 {% extends "relatorio.html" %}
 {% load votacao_extras %}
 
 {% block report_title %}Relatório de Votação{% endblock %}
 
 {% block my_style %}
-    table.reuniao {
-            border-top: 0.1pt solid #999999;
-        }
-        tr.reuniao {
-            padding-top: 5px;
-        }
-        tr.proposicao {
-            padding-top: 5px;
-        }        
-{% endblock %} 
+table.reuniao {
+border-top: 0.1pt solid #999999;
+}
+tr.reuniao {
+padding-top: 5px;
+}
+tr.proposicao {
+padding-top: 5px;
+}
+{% endblock %}
 
 {% block content %}
-    <div id="content">
-    	{% if votacoes %}
-    		{% for votacao in votacoes.VotacaoJSONs %}
-                <table class="bordered">
-                    <tr class="reuniao"><td><h1>{{ votacoes.ini_nome }}</h1></td></tr>
-                    <tr><td><h3>Número da Reunião: {{ votacoes.rec_numero }}</h3></td></tr>
-                    <tr><td><h3>Reunião: {{ votacoes.rec_tipo_reuniao }}</h3></td></tr>
-                    <tr><td><h3>Data: {{ votacoes.rec_data }}</h3></td></tr>
-                </table>
-                <table class="reuniao">
-                    <tr class="proposicao"><td colspan="7"><h1>{{ votacao.codigo_proposicao }}</h1></td></tr>
-                    <tr>
-                        <td><h2>Iniciativa</h2></td>
-                        <td colspan="6"><h2>{{ votacao.iniciativa }}</h2></td>
-                    </tr>
-                    <tr>
-                        <td><h2>Relator</h2></td>
-                        <td colspan="6"><h2>{{ votacao.relator }}</h2></td>
-                    </tr>
-                </table>
-                <table class="reuniao">
-                    <tr class="reuniao">
-                        <td colspan="7">Como votaram os vereadores</td>
-                    </tr>
-                    {% for voto in votacao.VotoJSONs %}
-                        <tr>
-                            <td colspan="6">{{ voto.vereador }}</td>
-                            <td width="30%" align="right">{{ voto.voto|voto_extenso }}</td>
-                        </tr>
-                        {% if voto.voto == 'R' %}
-                            <tr>
-                                <td colspan="7" align="right">{{ voto.restricao }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </table>
-                <table class="reuniao">
-                    <tr class="reuniao">
-                        <td colspan="6">TOTAL VOTOS FAVORÁVEL</td>
-                        <td align="right">{{ votacao.TotalJSONs.0.favoravel }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6">TOTAL VOTOS FAVORÁVEL COM RESTRIÇÕES</td>
-                        <td align="right">{{ votacao.TotalJSONs.0.favoravel_restricoes }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6">TOTAL VOTOS CONTRÁRIO</td>
-                        <td align="right">{{ votacao.TotalJSONs.0.contrario }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6">TOTAL VOTOS VISTAS</td>
-                        <td align="right">{{ votacao.TotalJSONs.0.vista }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6">TOTAL VOTOS ABSTENÇÃO</td>
-                        <td align="right">{{ votacao.TotalJSONs.0.abstencao }}</td>
-                    </tr>
-                </table>
-                <div>
-                    <pdf:nextpage /> 
-                </div> 
-            {% endfor %}
-    	{% else %}
-    		<h2 align="center">NENHUMA VOTAÇÃO COMPUTADA</h2>
-    	{% endif %}
+<div id="content">
+    {% if votacoes %}
+    {% for votacao in votacoes.VotacaoJSONs %}
+    <table class="bordered">
+        <tr class="reuniao">
+            <td>
+                <h1>{{ votacoes.ini_nome }}</h1>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Número da Reunião: {{ votacoes.rec_numero }}</h3>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Reunião: {{ votacoes.rec_tipo_reuniao }}</h3>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h3>Data: {{ votacoes.rec_data }}</h3>
+            </td>
+        </tr>
+    </table>
+    <table class="reuniao">
+        <tr class="proposicao">
+            <td colspan="7">
+                <h1>{{ votacao.codigo_proposicao }}</h1>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h2>Iniciativa</h2>
+            </td>
+            <td colspan="6">
+                <h2>{{ votacao.iniciativa }}</h2>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h2>Relator</h2>
+            </td>
+            <td colspan="6">
+                <h2>{{ votacao.relator }}</h2>
+            </td>
+        </tr>
+    </table>
+    <table class="reuniao">
+        <tr class="reuniao">
+            <td colspan="7">Como votaram os vereadores</td>
+        </tr>
+        {% for voto in votacao.VotoJSONs %}
+        <tr>
+            <td colspan="6">{{ voto.vereador }}</td>
+            <td width="30%" align="right">{{ voto.voto|voto_extenso }}</td>
+        </tr>
+        {% if voto.voto == 'R' %}
+        <tr>
+            <td colspan="7" align="right">{{ voto.restricao }}</td>
+        </tr>
+        {% elif voto.voto == 'C' %}
+        <tr>
+            <td colspan="7" align="right">{{ voto.desc_contrario }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+    <table class="reuniao">
+        <tr class="reuniao">
+            <td colspan="6">TOTAL VOTOS FAVORÁVEL</td>
+            <td align="right">{{ votacao.TotalJSONs.0.favoravel }}</td>
+        </tr>
+        <tr>
+            <td colspan="6">TOTAL VOTOS FAVORÁVEL COM RESTRIÇÕES</td>
+            <td align="right">{{ votacao.TotalJSONs.0.favoravel_restricoes }}</td>
+        </tr>
+        <tr>
+            <td colspan="6">TOTAL VOTOS CONTRÁRIO</td>
+            <td align="right">{{ votacao.TotalJSONs.0.contrario }}</td>
+        </tr>
+        <tr>
+            <td colspan="6">TOTAL VOTOS VISTAS</td>
+            <td align="right">{{ votacao.TotalJSONs.0.vista }}</td>
+        </tr>
+        <tr>
+            <td colspan="6">TOTAL VOTOS ABSTENÇÃO</td>
+            <td align="right">{{ votacao.TotalJSONs.0.abstencao }}</td>
+        </tr>
+    </table>
+    <div>
+        <pdf:nextpage />
     </div>
+    {% endfor %}
+    {% else %}
+    <h2 align="center">NENHUMA VOTAÇÃO COMPUTADA</h2>
+    {% endif %}
+</div>
 {% endblock %}

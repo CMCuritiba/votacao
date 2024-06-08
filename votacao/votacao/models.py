@@ -101,3 +101,21 @@ class VotoContrario(models.Model):
 
 	def __str__(self):
 		return self.id_texto
+
+#---------------------------------------------------------------------------------------------
+# Model VotoContrarioComplemento
+#---------------------------------------------------------------------------------------------
+@python_2_unicode_compatible
+class VotoContrarioComplemento(models.Model):
+	class Meta:
+		verbose_name_plural = 'Complemento Voto Contrário'
+
+	voto_contrario = models.ForeignKey(VotoContrario, on_delete=models.CASCADE)
+	tcp_nome = models.CharField(max_length=200)
+	vereador = models.CharField(max_length=200)
+
+	def __unicode__(self):
+		return self.tcp_nome
+
+	def __str__(self):
+		return self.tcp_nome		
