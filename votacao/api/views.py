@@ -400,6 +400,7 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
     consumer = MSCMCConsumer()
     data = []
 
+    print('--1')
     array_json=[]
     if (request.method == 'GET'):
         if (pac_id != None and par_id != None and codigo_projeto != None):
@@ -409,23 +410,36 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
             tot_abstencao = 0
             tot_vista = 0
             try:
+                print('--2')
                 rec_id = consumer.consome_rec_id(request, pac_id)
+                print('--3')
                 reuniao = consumer.consome_reuniao(request, rec_id)
+                print('--4')
                 con_id = reuniao['con_id']
                 rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
                 rec_data = reuniao['rec_data']
                 rec_numero = reuniao['rec_numero']
+                print('--5')
                 comissao = consumer.consome_comissao(request, con_id)
+                print('--6')
                 ini_nome = comissao['ini_nome']
 
                 search_url = '{}/api/spl/projeto/{}/{}/{}/'.format(settings.MSCMC_SERVER, pac_id, par_id, codigo_projeto)
+                print('--7')
                 r = requests.get(search_url, verify=False)
+                print('--8')
                 projeto = r.json()
+                print('--9')
                 codigo_proposicao = projeto[0]['codigo_proposicao']
+                print('--10')
                 iniciativa = projeto[0]['iniciativa']
+                print('--11')
                 sumula = projeto[0]['sumula']
+                print('--12')
                 relator = projeto[0]['relator']
+                print('--13')
                 conclusao = projeto[0]['conclusao_relator']
+                print('--14')
 
                 try:
                     votacao_banco = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
@@ -461,7 +475,9 @@ def monta_painel(request, pac_id, par_id, codigo_projeto):
                 asJsonFromJson = JsonConvert.ToJSON(fromJson)
                 data = jsonref.loads(asJson)
                 return JsonResponse(data, safe=False)           
-            except:
+            except Exception as e:
+                print('--15')
+                print(e)
                 asJson = JsonConvert.ToJSON(votacao)
                 fromJson = JsonConvert.FromJSON(asJson)
                 asJsonFromJson = JsonConvert.ToJSON(fromJson)
