@@ -5,79 +5,79 @@ Django==2.1.1
 
 Markdown==2.6.11
 
-Underscore>=0.0.30000001
+Underscore==0.0.30000001
 
-also>=0.0.2
+also==0.0.2
 
-dj-database-url>=0.5.0
+dj-database-url==0.5.0
 
-django-bower>=5.2.0
+django-bower==5.2.0
 
-django-crispy-forms>=1.7.2
+django-crispy-forms==1.7.2
 
-django-environ>=0.4.4
+django-environ==0.4.5
 
-django-extensions>=2.0.7
+django-extensions==2.1.5
 
-django-filter>=1.1.0
+django-filter==2.1.0
 
 django-pipeline==1.6.14
 
-djangorestframework>=3.8.2
+djangorestframework==3.9.1
 
-pytz>=2018.4
+pytz==2018.9
 
-six>=1.11.0
+six==1.12.0
 
-sqlparse>=0.2.4
+sqlparse==0.2.4
 
 https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.8.tar.gz
 
 django-python3-ldap==0.11.1
 django-ldapdb==1.0.0
 
-django-braces>=1.13.0
+django-braces==1.13.0
 
-simplejson>=3.15.0
+simplejson==3.16.0
 
-factory-boy>=2.11.1
+factory-boy==2.11.1
 
-django-tinymce4-lite>=1.7.1
+django-tinymce4-lite==1.7.4
 
 # Python-PostgreSQL Database Adapter
-psycopg2
+psycopg2==2.7.7
 
 # Unipath
-unipath
+unipath==1.1
 
 # Redis support
-django-redis>=4.7.0
-redis>=2.10.5
+django-redis==4.10.0
+redis==3.1.0
 
-django-pipeline-forgiving>=1.0.0
+django-pipeline-forgiving==1.0.0
 
-django-bootstrap3-datetimepicker-2>=2.6.0
+django-bootstrap3-datetimepicker-2==2.8.2
 
-pyenchant>=2.0.0
+pyenchant==2.0.0
 
-setuptools
+setuptools==40.8.0
 
-requests
+requests==2.21.0
 
-django-settings-export
+django-settings-export==1.2.1
 
-psycopg2-binary
+psycopg2-binary==2.7.7
 
 # Consumer
 https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-consumer-0.2.tar.gz?raw=true
 
 # Relatorios
-xhtml2pdf
+xhtml2pdf==0.2.3
 django-easy-pdf==0.1.1
 reportlab==3.5.23
 
 # Json
-jsonref
+jsonref==0.2
 
 # Biblioteca relatorios
 https://github.com/CMCuritiba/django-cmc-report/blob/master/dist/django-cmc-report-0.1.tar.gz?raw=true

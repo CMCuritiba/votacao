@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-cd /usr/share/webapps/votacao
+cd /app || exit 1
 
-mkdir -p /usr/share/webapps/votacao/var/run
-rm -f /usr/share/webapps/votacao/var/run/*
+mkdir -p /app/var/run
+rm -f /app/var/run/*
 
-exec /usr/share/envs/votacao/bin/gunicorn config.wsgi -c deploy/production/gunicorn.conf.py  --env DJANGO_SETTINGS_MODULE=config.settings.production
+service nginx restart
+
+exec "$VIRTUAL_ENV/bin/gunicorn" config.wsgi -c deploy/production/gunicorn.conf.py  --env DJANGO_SETTINGS_MODULE=config.settings.production
