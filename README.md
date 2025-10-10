@@ -44,3 +44,7 @@ python3 manage.py makemigrations --settings=config.settings.production
 python3 manage.py makemigrations autentica votacao --settings=config.settings.production
 python3 manage.py migrate --settings=config.settings.production
 ```
+
+## MSCMC
+
+Depende da aplicação [MSCMC](https://github.com/CMCuritiba/mscmcldap).
