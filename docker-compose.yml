@@ -1,14 +1,4 @@
 services:
-  db-postgres:
-    image: postgres:15.5-alpine
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: votacao
-    ports:
-      - "15432:5432"
-    volumes:
-      - "pgdata:/var/lib/postgresql/data"
   votacao:
     build:
       context: .
@@ -17,24 +7,5 @@ services:
         - votacao:latest
     image: votacao:latest
     ports:
-      - 8080:80
-    environment:
-      MSCMC_SERVER: http://mscmc
-      LDAP_AUTH_URL: ldap://ldap
-      DATABASE_URL: postgres://postgres:postgres@db-postgres:5432/votacao
-      SECRET_KEY_PROD: changeme
-    depends_on:
-      - db-postgres
-    #   - mscmc
+      - 80:80
     restart: unless-stopped
-#   mscmc:
-#     image: mscmc:latest
-#     ports:
-#       - 8081:80
-#     environment:
-#       DATABASE_URL: "postgres://postgres:postgres@db-postgres:5432/mscmc"
-#       SECRET_KEY_PROD: "changeme"
-#     restart: unless-stopped
-
-volumes:
-  pgdata:

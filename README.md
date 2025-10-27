@@ -18,6 +18,12 @@ Para subir a aplicação em um container:
    docker compose up
    ```
 
+   Ou
+
+   ```shell
+   docker compose -f docker-compose.yml -f docker-compose-db.yml -f docker-compose-mscmc.yml --env-file .env.example up
+   ```
+
 4. Para fazer o build da imagem sem utilizar o compose:
 
    ```shell

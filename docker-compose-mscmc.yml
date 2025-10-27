@@ -1,0 +1,6 @@
+services:
+  mscmc:
+    image: mscmc:latest
+    ports:
+      - 81:80
+    restart: unless-stopped
