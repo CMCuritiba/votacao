@@ -31,7 +31,7 @@ six==1.12.0
 
 sqlparse==0.2.4
 
-https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.8.tar.gz
+https://raw.githubusercontent.com/CMCuritiba/django-cmcldapauth/master/dist/django-cmcldapauth-0.8.tar.gz
 
 django-python3-ldap==0.11.1
 django-ldapdb==1.0.0
@@ -69,7 +69,7 @@ django-settings-export==1.2.1
 psycopg2-binary==2.7.7
 
 # Consumer
-https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-consumer-0.2.tar.gz?raw=true
+https://raw.githubusercontent.com/CMCuritiba/django-cmc-consumer/master/dist/django-cmc-consumer-0.2.tar.gz
 
 # Relatorios
 xhtml2pdf==0.2.3
@@ -80,7 +80,7 @@ reportlab==3.5.23
 jsonref==0.2
 
 # Biblioteca relatorios
-https://github.com/CMCuritiba/django-cmc-report/blob/master/dist/django-cmc-report-0.1.tar.gz?raw=true
+https://raw.githubusercontent.com/CMCuritiba/django-cmc-report/master/dist/django-cmc-report-0.1.tar.gz
 
 # Nose
 django-nose==1.4.6
