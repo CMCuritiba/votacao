@@ -414,6 +414,7 @@ BOWER_INSTALLED_APPS = (
     'datatables-bootstrap3',
     'bootstrap-3-datepicker',
     'bootstrap-datepicker',
+    'datatables.net-responsive#2.2.3',
     'datatables.net-responsive-bs',
     'datatables-datetime-moment',
     'bootstrap-select',
