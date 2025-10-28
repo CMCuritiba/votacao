@@ -6,6 +6,25 @@ services:
       tags:
         - votacao:latest
     image: votacao:latest
+    environment:
+      DEBUG: "${votacao_debug}"
+      TEMPLATE_DEBUG: "${votacao_template_debug}"
+      DJANGO_DEBUG: "${votacao_django_debug}"
+      MSCMC_SERVER: "${votacao_mscmc_server}"
+      DATABASE_URL: "${votacao_database_url}"
+      SECRET_KEY_PROD: "${votacao_secret_key_prod}"
+      LDAP_AUTH_URL: "${votacao_ldap_url}"
+      LDAP_BIND_USERNAME: "${votacao_ldap_bind_user}"
+      LDAP_BIND_PASSWORD: "${votacao_ldap_bind_pass}"
+      LDAP_AUTH_SEARCH_BASE: "${votacao_ldap_search_base}"
+      LDAP_AUTH_BIND_BASE: "${votacao_ldap_bind_base}"
+      LDAP_AUTH_OBJECT_CLASS: "${votacao_ldap_object_class}"
+      LDAP_AUTH_USER_FIELDS_USERNAME: "${votacao_ldap_field_username}"
+      LDAP_AUTH_USER_FIELDS_FIRST_NAME: "${votacao_ldap_field_first_name}"
+      LDAP_AUTH_USER_FIELDS_LAST_NAME: "${votacao_ldap_field_last_name}"
+      LDAP_AUTH_USER_FIELDS_EMAIL: "${votacao_ldap_field_email}"
+      LDAP_AUTH_USER_FIELDS_CPF: "${votacao_ldap_field_cpf}"
+      LDAP_AUTH_USER_FIELDS_LOTADO: "${votacao_ldap_field_lotado}"
     ports:
       - 80:80
     restart: unless-stopped

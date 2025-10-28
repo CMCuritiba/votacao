@@ -1,6 +1,9 @@
 services:
   mscmc:
     image: mscmc:latest
+    environment:
+      DATABASE_URL: "${mscmc_database_url}" 
+      SECRET_KEY_PROD: "${mscmc_secret_key_prod}" 
     ports:
       - 81:80
     restart: unless-stopped
