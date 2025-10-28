@@ -24,6 +24,13 @@ Para subir a aplicação em um container:
    docker compose -f docker-compose.yml -f docker-compose-db.yml -f docker-compose-mscmc.yml --env-file .env.example up
    ```
 
+   Para ambiente **produtivo**, considerando que a imagem `mscmc:latest` já
+   existe, crie o arquivo `.env` e utilize o comando:
+
+   ```shell
+   docker compose -f docker-compose.yml -f docker-compose-mscmc.yml up -d
+   ```
+
 4. Para fazer o build da imagem sem utilizar o compose:
 
    ```shell
