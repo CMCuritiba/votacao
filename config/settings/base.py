@@ -85,6 +85,9 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS  = False
 SECURE_FRAME_DENY               = False
 '''
 
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION
@@ -187,15 +190,16 @@ TEMPLATES = [
         'DIRS': [
             str(APPS_DIR.path('templates')),
         ],
+        'APP_DIRS': True,
         'OPTIONS': {
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
             'debug': DEBUG,
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
             # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
-            'loaders': [
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            ],
+            # 'loaders': [
+            #     'django.template.loaders.filesystem.Loader',
+            #     'django.template.loaders.app_directories.Loader',
+            # ],
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -277,6 +281,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ------------------------------------------------------------------------------
 AUTHENTICATION_BACKENDS = [
     # "django_python3_ldap.auth.LDAPBackend",
+    'autentica.lib.ldap_auth.AuthBackend',
     'django.contrib.auth.backends.ModelBackend',
  ]
 
@@ -294,53 +299,79 @@ ADMIN_URL = r'^admin/'
 # LOGGING
 # ------------------------------------------------------------------------------
 
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "console": {
+#             "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+#         },
+#         "file" : {
+#             "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+#         },
+#     },
+#     "handlers": {
+#         "console": {
+#             "level": "INFO",
+#             "class": "logging.StreamHandler",
+#             "formatter": "console",
+#         },
+#         "file" : {
+#             "level": "INFO",
+#             "class": "logging.FileHandler",
+#             "filename": "votacao.log",
+#             "formatter": "file",
+#         },
+#     },
+#     "loggers": {
+#         "django": {
+#             "handlers": ["console"],
+#             "level": "ERROR",  
+#             "propagate": True,
+#         },
+#          'django.request': {
+#             'handlers': ['console'],
+#             'level': 'ERROR',
+#             'propagate': False,
+#         },
+#         "root": {  
+#             "handlers": ["console", "file"],
+#             "level": "INFO",
+#         },
+#         "django_python3_ldap": {
+#             "handlers": ["console"],
+#             "level": "INFO",
+#         },
+#     },
+# }
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+
     "formatters": {
         "console": {
-            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
-        },
-        "file" : {
-            "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         },
     },
+
     "handlers": {
         "console": {
-            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "console",
         },
-        "file" : {
-            "level": "INFO",
-            "class": "logging.FileHandler",
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": "votacao.log",
-            "formatter": "file",
+            "maxBytes": 1024 * 1024 * 5,
+            "backupCount": 5,
+            "formatter": "console",
         },
     },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "ERROR",  
-            "propagate": True,
-        },
-         'django.request': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-        "": {
-            "handlers": ["console", "file"],
-            "level": "INFO",  
-            "propagate": True,
-        },
-        "django_python3_ldap": {
-            "handlers": ["console"],
-            "level": "INFO",
-        },
-    },
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    }
 }
-
 # PIPELINE
 # ------------------------------------------------------------------------------
 
@@ -381,13 +412,13 @@ PIPELINE = {
               'bootstrap-datepicker/dist/locales/bootstrap-datepicker.pt-BR.min.js',
               'bootstrap-select/dist/js/bootstrap-select.js',
               'fontawesome/svg-with-js/js/fontawesome-all.min.js',
-              'datatables/media/js/jquery.dataTables.js',
-              'datatables/media/js/dataTables.bootstrap.js',
+              'datatables/media/js/jquery.dataTables.min.js',
+              'datatables/media/js/dataTables.bootstrap.min.js',
               'datatables.net-responsive/js/dataTables.responsive.min.js',
               'datatables.net-responsive-bs/js/responsive.bootstrap.min.js',
               'datatables-datetime-moment/dist/js/datetime-moment.min.js',
               'axios/dist/axios.min.js',
-              #'vue/dist/vue.min.js',
+              'vue/dist/vue.min.js',
               #'vue/dist/vue.common.js',
               'build.js',
               #'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js',
@@ -414,7 +445,8 @@ BOWER_INSTALLED_APPS = (
     'datatables-bootstrap3',
     'bootstrap-3-datepicker',
     'bootstrap-datepicker',
-    'datatables.net-responsive-bs',
+    'datatables.net-responsive-bs#2.2.3',
+    'datatables.net-responsive#2.2.3',
     'datatables-datetime-moment',
     'bootstrap-select',
     'fontawesome',

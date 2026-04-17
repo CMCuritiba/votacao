@@ -1,5 +1,6 @@
 
-Django==2.1.1
+#Django==2.1.1
+Django==2.2.8
 #Django==1.10.8
 #Django==1.9.13
 
@@ -31,7 +32,7 @@ six>=1.11.0
 
 sqlparse>=0.2.4
 
-https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.8.tar.gz
+https://github.com/CMCuritiba/django-cmcldapauth/raw/master/dist/django-cmcldapauth-0.9.tar.gz
 
 django-python3-ldap==0.11.1
 django-ldapdb==1.0.0
@@ -74,7 +75,9 @@ https://github.com/CMCuritiba/django-cmc-consumer/blob/master/dist/django-cmc-co
 # Relatorios
 xhtml2pdf
 django-easy-pdf==0.1.1
-reportlab==3.5.23
+# reportlab==3.5.23
+# reportlab==3.6.13
+reportlab==3.5.68
 
 # Json
 jsonref

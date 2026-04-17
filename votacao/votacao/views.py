@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from datetime import datetime
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect
 from django.views.generic import TemplateView, DetailView
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.utils.decorators import method_decorator
@@ -139,3 +140,15 @@ class AdminUsuariosUpdate(CMCAdminLoginRequired, SuccessMessageMixin, UpdateView
     success_url = '/admin/gerencia/usuario/'
     success_message = "Permissões do usuário alteradas com sucesso"
     template_name = 'admin/usuario/update.html'       
+
+#--------------------------------------------------------------------------------------
+# Redirect Index (/)
+#--------------------------------------------------------------------------------------
+def index_redirect(request):
+    if not request.user.is_authenticated:
+        return redirect('/autentica/loga/')
+
+    if request.user.is_superuser:
+        return redirect('/admin/')
+    
+    return redirect('/vereador/vota/')

@@ -17,8 +17,10 @@ urlpatterns = [
     re_path(r'^autentica/', include('autentica.urls')),
     re_path(r'^admin/', include('votacao.votacao.urls')),
     re_path(r'^api/', include('votacao.api.urls')),
-    re_path(r'^vereador/vota', include('votacao.votacao.vereador_url')),
-    path('', viewsadmin.AdminIndex.as_view(), name='index'),
+    # re_path(r'^vereador/vota', include('votacao.votacao.vereador_url')),
+    path('vereador/', include('votacao.votacao.vereador_url')),
+    # path('', viewsadmin.AdminIndex.as_view(), name='index'),
+    path('', viewsadmin.index_redirect, name='index'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

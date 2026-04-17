@@ -248,6 +248,7 @@
 				carregaDados() {
 					axios
 						.get('/api/monta_painel/{{ pac_id }}/{{ par_id }}/{{ codigo_projeto }}/')
+						// .get('/api/monta_painel/1955/3440/005.00049.2024/')
 						.then(response => (
 							this.status_votacao = response.data.status,
 							this.codigo_proposicao = response.data.codigo_proposicao,
