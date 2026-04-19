@@ -249,66 +249,123 @@ def relatorio_votacao(request, pac_id):
 
     rec_id = consumer.consome_rec_id(request, pac_id)
     reuniao = consumer.consome_reuniao(request, rec_id)
-    con_id = reuniao['con_id']
-    rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
-    #print(reuniao)
-    rec_data = reuniao['rec_data']
-    rec_numero = reuniao['rec_numero']
+
+    con_id = reuniao.get('con_id')
+    rec_tipo_reuniao = reuniao.get('rec_tipo_reuniao')
+    rec_data = reuniao.get('rec_data')
+    rec_numero = reuniao.get('rec_numero')
+
     comissao = consumer.consome_comissao(request, con_id)
-    ini_nome = comissao['ini_nome']
+    ini_nome = comissao.get('ini_nome')
+
     reuniao_js = ReuniaoJSON(rec_id, rec_tipo_reuniao, rec_numero, ini_nome, rec_data)
 
-    votacoes_model = Votacao.objects.filter(status='V', pac_id = pac_id)
+    votacoes_model = Votacao.objects.filter(status='V', pac_id=pac_id)
+
     for votacao in votacoes_model:
+        # --- Dados externos (API)
+        relator = None
+        iniciativa = None
+
         try:
-            search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(settings.MSCMC_SERVER, votacao.pac_id, votacao.par_id)
+            search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(
+                settings.MSCMC_SERVER, votacao.pac_id, votacao.par_id
+            )
             r = requests.get(search_url, verify=False)
             projeto = r.json()
-            relator = projeto[0]['relator']
-            iniciativa = projeto[0]['iniciativa']
-        except:
-            relator = None
-            iniciativa = None
+
+            if projeto:
+                relator = projeto[0].get('relator')
+                iniciativa = projeto[0].get('iniciativa')
+        except Exception:
+            pass
+
+        # --- Totais
         tot_favoravel = 0
         tot_favoravel_restricoes = 0
         tot_contrario = 0
         tot_abstencao = 0
         tot_vista = 0
-        if rec_id is not None:
-            votacao_incluir = VotacaoJSON(con_id, votacao.codigo_proposicao, relator, iniciativa)
 
-        if rec_id is not None and con_id is not None:
-            for voto in votacao.lista_votos():
-                desc_restricao = ''
-                if voto.voto == 'F':
-                    tot_favoravel += 1
-                elif voto.voto == 'C':
-                    try: 
-                        voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
-                        voto_contrario_complemento = VotoContrarioComplemento.objects.get(voto_contrario_id=voto_contrario.id)
-                        desc_contrario = voto_contrario_complemento.vereador + " - " + voto_contrario_complemento.tcp_nome
-                    except VotoContrario.DoesNotExist:
-                            restricao = Restricao.objects.get(voto_id=voto.id)
-                            desc_contrario = "COM RESTRIÇÕES - " + restricao.restricao
-                    tot_contrario += 1
-                elif voto.voto == 'R':
-                    tot_favoravel_restricoes += 1
+        if not rec_id or not con_id:
+            continue
+
+        votacao_incluir = VotacaoJSON(
+            con_id,
+            votacao.codigo_proposicao,
+            relator,
+            iniciativa
+        )
+
+        # --- Loop de votos
+        for voto in votacao.lista_votos():
+            desc_contrario = ''
+            desc_restricao = ''
+
+            if voto.voto == 'F':
+                tot_favoravel += 1
+
+            elif voto.voto == 'C':
+                tot_contrario += 1
+
+                try:
+                    voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
+
+                    try:
+                        comp = VotoContrarioComplemento.objects.get(
+                            voto_contrario_id=voto_contrario.id
+                        )
+                        desc_contrario = f"{comp.vereador} - {comp.tcp_nome}"
+                    except VotoContrarioComplemento.DoesNotExist:
+                        desc_contrario = "Voto contrário sem complemento"
+
+                except VotoContrario.DoesNotExist:
+                    try:
+                        restricao = Restricao.objects.get(voto_id=voto.id)
+                        desc_contrario = f"COM RESTRIÇÕES - {restricao.restricao}"
+                    except Restricao.DoesNotExist:
+                        desc_contrario = "Voto contrário"
+
+            elif voto.voto == 'R':
+                tot_favoravel_restricoes += 1
+                try:
                     restricao = Restricao.objects.get(voto=voto)
                     desc_restricao = restricao.restricao
-                elif voto.voto == 'A':
-                    tot_abstencao += 1
-                elif voto.voto == 'V':
-                    tot_vista += 1
-                # votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, desc_restricao))
-                votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, '', desc_contrario))
-            votacao_incluir.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
-        reuniao_js.VotacaoJSONs.append(votacao_incluir)     
+                except Restricao.DoesNotExist:
+                    desc_restricao = "Sem descrição"
 
+            elif voto.voto == 'A':
+                tot_abstencao += 1
+
+            elif voto.voto == 'V':
+                tot_vista += 1
+
+            votacao_incluir.VotoJSONs.append(
+                VotoJSON(
+                    voto.vereador.get_full_name(),
+                    voto.voto,
+                    desc_restricao,
+                    desc_contrario
+                )
+            )
+
+        # --- Totais
+        votacao_incluir.TotalJSONs.append(
+            TotalJSON(
+                tot_contrario,
+                tot_favoravel,
+                tot_favoravel_restricoes,
+                tot_abstencao,
+                tot_vista
+            )
+        )
+
+        reuniao_js.VotacaoJSONs.append(votacao_incluir)
+
+    # --- Serialização final
     asJson = JsonConvert.ToJSON(reuniao_js)
-    fromJson = JsonConvert.FromJSON(asJson)
-    asJsonFromJson = JsonConvert.ToJSON(fromJson)
     data = jsonref.loads(asJson)
-    # print(data)
+
     return data
 
 # -----------------------------------------------------------------------------------
