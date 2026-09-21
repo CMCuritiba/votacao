@@ -441,7 +441,7 @@ BOWER_INSTALLED_APPS = (
     'jquery#1.9.1',
     'underscore',
     'bootstrap#3',
-    'datatables',
+    'datatables#1.10.19',
     'datatables-bootstrap3',
     'bootstrap-3-datepicker',
     'bootstrap-datepicker',
