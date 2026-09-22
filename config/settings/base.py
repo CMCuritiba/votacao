@@ -451,7 +451,7 @@ BOWER_INSTALLED_APPS = (
     'bootstrap-select',
     'fontawesome',
     'moment',
-    'axios',
+    'axios#0.18.0',
     'vue',
 )
 
