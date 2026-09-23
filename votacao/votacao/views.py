@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import json 
+import os
+import requests
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -12,10 +14,11 @@ from django.views.generic import TemplateView, DetailView
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.template import RequestContext
+from django.db import connection
+
 
 from easy_pdf.views import PDFTemplateView
 
@@ -36,6 +39,51 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+#--------------------------------------------------------------------------------------
+# Health Check
+#--------------------------------------------------------------------------------------
+def health(request):
+    try:
+        # Testa conexão com o banco
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+
+        # Testa API
+        api_url = os.environ.get('MSCMC_SERVER')
+
+        if not api_url:
+            logger.error("Variável de ambiente MSCMC_SERVER não configurada")
+            return JsonResponse(
+                {'status': 'unhealthy'},
+                status=503
+            )
+
+        response = requests.get(
+            f'{api_url.rstrip("/")}/api/misc/connection/',
+            timeout=2
+        )
+
+        if response.status_code != 200:
+            logger.error(
+                "Health check: API retornou HTTP %s",
+                response.status_code
+            )
+            return JsonResponse(
+                {'status': 'unhealthy'},
+                status=503
+            )
+
+        return JsonResponse(
+            {'status': 'healthy'},
+            status=200
+        )
+
+    except Exception:
+        logger.exception("Health check falhou")
+        return JsonResponse(
+            {'status': 'unhealthy'},
+            status=503
+        )
 #--------------------------------------------------------------------------------------
 # Admin Index
 #--------------------------------------------------------------------------------------    
