@@ -15,4 +15,6 @@ urlpatterns = [
 	path('painel/', views.PainelIndex.as_view(), name='painel-index'),
 	path('gerencia/usuario/', views.AdminUsuariosIndex.as_view(), name='usuario-index'),
 	path('gerencia/usuario/altera/<int:pk>/', views.AdminUsuariosUpdate.as_view(), name='usuario-altera'),
+	
+	path('health/', views.health, name='health'),
 ]	
