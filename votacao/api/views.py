@@ -70,7 +70,7 @@ def verifica_abertos(request):
 # -----------------------------------------------------------------------------------
 # chamada API para retornar status do projeto
 # -----------------------------------------------------------------------------------
-def consome_projetos(request, pac_id):
+def consome_projetos(request, pac_id, con_id):
 
     array_json=[]
     if (pac_id != None):
@@ -78,6 +78,9 @@ def consome_projetos(request, pac_id):
         r = requests.get(search_url, verify=False)
         projetos = r.json()
         for projeto in projetos:
+            ### 
+            print(projeto)
+            
             array_json.append(formata_projeto(projeto))
     return JsonResponse(array_json, safe=False)     
 
@@ -246,66 +249,123 @@ def relatorio_votacao(request, pac_id):
 
     rec_id = consumer.consome_rec_id(request, pac_id)
     reuniao = consumer.consome_reuniao(request, rec_id)
-    con_id = reuniao['con_id']
-    rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
-    #print(reuniao)
-    rec_data = reuniao['rec_data']
-    rec_numero = reuniao['rec_numero']
+
+    con_id = reuniao.get('con_id')
+    rec_tipo_reuniao = reuniao.get('rec_tipo_reuniao')
+    rec_data = reuniao.get('rec_data')
+    rec_numero = reuniao.get('rec_numero')
+
     comissao = consumer.consome_comissao(request, con_id)
-    ini_nome = comissao['ini_nome']
+    ini_nome = comissao.get('ini_nome')
+
     reuniao_js = ReuniaoJSON(rec_id, rec_tipo_reuniao, rec_numero, ini_nome, rec_data)
 
-    votacoes_model = Votacao.objects.filter(status='V', pac_id = pac_id)
+    votacoes_model = Votacao.objects.filter(status='V', pac_id=pac_id)
+
     for votacao in votacoes_model:
+        # --- Dados externos (API)
+        relator = None
+        iniciativa = None
+
         try:
-            search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(settings.MSCMC_SERVER, votacao.pac_id, votacao.par_id)
+            search_url = '{}/api/spl/projeto_reuniao/{}/{}/'.format(
+                settings.MSCMC_SERVER, votacao.pac_id, votacao.par_id
+            )
             r = requests.get(search_url, verify=False)
             projeto = r.json()
-            relator = projeto[0]['relator']
-            iniciativa = projeto[0]['iniciativa']
-        except:
-            relator = None
-            iniciativa = None
+
+            if projeto:
+                relator = projeto[0].get('relator')
+                iniciativa = projeto[0].get('iniciativa')
+        except Exception:
+            pass
+
+        # --- Totais
         tot_favoravel = 0
         tot_favoravel_restricoes = 0
         tot_contrario = 0
         tot_abstencao = 0
         tot_vista = 0
-        if rec_id is not None:
-            votacao_incluir = VotacaoJSON(con_id, votacao.codigo_proposicao, relator, iniciativa)
 
-        if rec_id is not None and con_id is not None:
-            for voto in votacao.lista_votos():
-                desc_restricao = ''
-                if voto.voto == 'F':
-                    tot_favoravel += 1
-                elif voto.voto == 'C':
-                    try: 
-                        voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
-                        voto_contrario_complemento = VotoContrarioComplemento.objects.get(voto_contrario_id=voto_contrario.id)
-                        desc_contrario = voto_contrario_complemento.vereador + " - " + voto_contrario_complemento.tcp_nome
-                    except VotoContrario.DoesNotExist:
-                            restricao = Restricao.objects.get(voto_id=voto.id)
-                            desc_contrario = "COM RESTRIÇÕES - " + restricao.restricao
-                    tot_contrario += 1
-                elif voto.voto == 'R':
-                    tot_favoravel_restricoes += 1
+        if not rec_id or not con_id:
+            continue
+
+        votacao_incluir = VotacaoJSON(
+            con_id,
+            votacao.codigo_proposicao,
+            relator,
+            iniciativa
+        )
+
+        # --- Loop de votos
+        for voto in votacao.lista_votos():
+            desc_contrario = ''
+            desc_restricao = ''
+
+            if voto.voto == 'F':
+                tot_favoravel += 1
+
+            elif voto.voto == 'C':
+                tot_contrario += 1
+
+                try:
+                    voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
+
+                    try:
+                        comp = VotoContrarioComplemento.objects.get(
+                            voto_contrario_id=voto_contrario.id
+                        )
+                        desc_contrario = f"{comp.vereador} - {comp.tcp_nome}"
+                    except VotoContrarioComplemento.DoesNotExist:
+                        desc_contrario = "Voto contrário sem complemento"
+
+                except VotoContrario.DoesNotExist:
+                    try:
+                        restricao = Restricao.objects.get(voto_id=voto.id)
+                        desc_contrario = f"COM RESTRIÇÕES - {restricao.restricao}"
+                    except Restricao.DoesNotExist:
+                        desc_contrario = "Voto contrário"
+
+            elif voto.voto == 'R':
+                tot_favoravel_restricoes += 1
+                try:
                     restricao = Restricao.objects.get(voto=voto)
                     desc_restricao = restricao.restricao
-                elif voto.voto == 'A':
-                    tot_abstencao += 1
-                elif voto.voto == 'V':
-                    tot_vista += 1
-                # votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, desc_restricao))
-                votacao_incluir.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, '', desc_contrario))
-            votacao_incluir.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
-        reuniao_js.VotacaoJSONs.append(votacao_incluir)     
+                except Restricao.DoesNotExist:
+                    desc_restricao = "Sem descrição"
 
+            elif voto.voto == 'A':
+                tot_abstencao += 1
+
+            elif voto.voto == 'V':
+                tot_vista += 1
+
+            votacao_incluir.VotoJSONs.append(
+                VotoJSON(
+                    voto.vereador.get_full_name(),
+                    voto.voto,
+                    desc_restricao,
+                    desc_contrario
+                )
+            )
+
+        # --- Totais
+        votacao_incluir.TotalJSONs.append(
+            TotalJSON(
+                tot_contrario,
+                tot_favoravel,
+                tot_favoravel_restricoes,
+                tot_abstencao,
+                tot_vista
+            )
+        )
+
+        reuniao_js.VotacaoJSONs.append(votacao_incluir)
+
+    # --- Serialização final
     asJson = JsonConvert.ToJSON(reuniao_js)
-    fromJson = JsonConvert.FromJSON(asJson)
-    asJsonFromJson = JsonConvert.ToJSON(fromJson)
     data = jsonref.loads(asJson)
-    # print(data)
+
     return data
 
 # -----------------------------------------------------------------------------------
@@ -396,95 +456,136 @@ def reinicia_votacao(request):
 # -----------------------------------------------------------------------------------
 # chamada API para retornar status do projeto
 # -----------------------------------------------------------------------------------
+from django.http import JsonResponse
+from django.conf import settings
+import requests
+import jsonref
+
 def monta_painel(request, pac_id, par_id, codigo_projeto):
+    if request.method != 'GET':
+        return JsonResponse([], safe=False)
+
+    if not (pac_id and par_id and codigo_projeto):
+        return JsonResponse([], safe=False)
+
     consumer = MSCMCConsumer()
-    data = []
 
-    print('--1')
-    array_json=[]
-    if (request.method == 'GET'):
-        if (pac_id != None and par_id != None and codigo_projeto != None):
-            tot_favoravel = 0
-            tot_favoravel_restricoes = 0
-            tot_contrario = 0
-            tot_abstencao = 0
-            tot_vista = 0
-            try:
-                print('--2')
-                rec_id = consumer.consome_rec_id(request, pac_id)
-                print('--3')
-                reuniao = consumer.consome_reuniao(request, rec_id)
-                print('--4')
-                con_id = reuniao['con_id']
-                rec_tipo_reuniao = reuniao['rec_tipo_reuniao']
-                rec_data = reuniao['rec_data']
-                rec_numero = reuniao['rec_numero']
-                print('--5')
-                comissao = consumer.consome_comissao(request, con_id)
-                print('--6')
-                ini_nome = comissao['ini_nome']
+    try:
+        # ---------------------------
+        # 1. Reunião
+        # ---------------------------
+        rec_id = consumer.consome_rec_id(request, pac_id)
+        reuniao = consumer.consome_reuniao(request, rec_id)
 
-                search_url = '{}/api/spl/projeto/{}/{}/{}/'.format(settings.MSCMC_SERVER, pac_id, par_id, codigo_projeto)
-                print('--7')
-                r = requests.get(search_url, verify=False)
-                print('--8')
-                projeto = r.json()
-                print('--9')
-                codigo_proposicao = projeto[0]['codigo_proposicao']
-                print('--10')
-                iniciativa = projeto[0]['iniciativa']
-                print('--11')
-                sumula = projeto[0]['sumula']
-                print('--12')
-                relator = projeto[0]['relator']
-                print('--13')
-                conclusao = projeto[0]['conclusao_relator']
-                print('--14')
+        con_id = reuniao.get('con_id')
+        rec_tipo_reuniao = reuniao.get('rec_tipo_reuniao')
+        rec_data = reuniao.get('rec_data')
+        rec_numero = reuniao.get('rec_numero')
 
+        # ---------------------------
+        # 2. Comissão
+        # ---------------------------
+        comissao = consumer.consome_comissao(request, con_id)
+        ini_nome = comissao.get('ini_nome') if comissao else None
+
+        # ---------------------------
+        # 3. Projeto
+        # ---------------------------
+        url = f"{settings.MSCMC_SERVER}/api/spl/projeto/{pac_id}/{par_id}/{codigo_projeto}/"
+        projeto_resp = requests.get(url, verify=False).json()
+
+        if not projeto_resp:
+            return JsonResponse([], safe=False)
+
+        projeto = projeto_resp[0]
+
+        codigo_proposicao = projeto.get('codigo_proposicao')
+        iniciativa = projeto.get('iniciativa')
+        sumula = projeto.get('sumula')
+        relator = projeto.get('relator')
+        conclusao = projeto.get('conclusao_relator')
+
+        # ---------------------------
+        # 4. Votação (banco)
+        # ---------------------------
+        votacao_banco = Votacao.objects.filter(
+            pac_id=pac_id,
+            par_id=par_id,
+            codigo_proposicao=codigo_projeto
+        ).first()
+
+        status_votacao = votacao_banco.status if votacao_banco else 'F'
+
+        votacao = PainelVotacaoJSON(
+            codigo_proposicao,
+            relator,
+            iniciativa,
+            sumula,
+            conclusao,
+            status_votacao,
+            ini_nome
+        )
+
+        # ---------------------------
+        # 5. Votos
+        # ---------------------------
+        tot_favoravel = 0
+        tot_favoravel_restricoes = 0
+        tot_contrario = 0
+        tot_abstencao = 0
+        tot_vista = 0
+
+        votos = votacao_banco.lista_votos() if votacao_banco else []
+
+        for voto in votos:
+            desc_contrario = ''
+
+            if voto.voto == 'F':
+                tot_favoravel += 1
+
+            elif voto.voto == 'C':
                 try:
-                    votacao_banco = Votacao.objects.get(pac_id=pac_id, par_id=par_id, codigo_proposicao=codigo_projeto)
-                    votacao = PainelVotacaoJSON(codigo_proposicao, relator, iniciativa, sumula, conclusao, votacao_banco.status, ini_nome)
-                except Votacao.DoesNotExist:
-                    votacao = PainelVotacaoJSON(codigo_proposicao, relator, iniciativa, sumula, conclusao, 'F', ini_nome)
+                    vc = VotoContrario.objects.get(voto_id=voto.id)
+                    vcc = VotoContrarioComplemento.objects.get(voto_contrario_id=vc.id)
+                    desc_contrario = f"{vcc.vereador} - {vcc.tcp_nome}"
+                except VotoContrario.DoesNotExist:
+                    restricao = Restricao.objects.get(voto_id=voto.id)
+                    desc_contrario = f"COM RESTRIÇÕES - {restricao.restricao}"
 
-                #votacao = PainelVotacaoJSON(codigo_proposicao, relator, iniciativa, sumula, conclusao, votacao_banco.status, ini_nome)
+                tot_contrario += 1
 
-                for voto in votacao_banco.lista_votos():
-                    desc_contrario = ''
-                    if voto.voto == 'F':
-                        tot_favoravel += 1
-                    elif voto.voto == 'C':
-                        try: 
-                            voto_contrario = VotoContrario.objects.get(voto_id=voto.id)
-                            voto_contrario_complemento = VotoContrarioComplemento.objects.get(voto_contrario_id=voto_contrario.id)
-                            desc_contrario = voto_contrario_complemento.vereador + " - " + voto_contrario_complemento.tcp_nome
-                        except VotoContrario.DoesNotExist:
-                            restricao = Restricao.objects.get(voto_id=voto.id)
-                            desc_contrario = "COM RESTRIÇÕES - " + restricao.restricao
-                        tot_contrario += 1
-                    elif voto.voto == 'R':
-                        tot_favoravel_restricoes += 1
-                    elif voto.voto == 'A':
-                        tot_abstencao += 1
-                    elif voto.voto == 'V':
-                        tot_vista += 1
-                    votacao.VotoJSONs.append(VotoJSON(voto.vereador.get_full_name(), voto.voto, '', desc_contrario))
-                votacao.TotalJSONs.append(TotalJSON(tot_contrario, tot_favoravel, tot_favoravel_restricoes, tot_abstencao, tot_vista))
-                asJson = JsonConvert.ToJSON(votacao)
-                fromJson = JsonConvert.FromJSON(asJson)
-                asJsonFromJson = JsonConvert.ToJSON(fromJson)
-                data = jsonref.loads(asJson)
-                return JsonResponse(data, safe=False)           
-            except Exception as e:
-                print('--15')
-                print(e)
-                asJson = JsonConvert.ToJSON(votacao)
-                fromJson = JsonConvert.FromJSON(asJson)
-                asJsonFromJson = JsonConvert.ToJSON(fromJson)
-                data = jsonref.loads(asJson)
-                return JsonResponse(data, safe=False)           
-    else:
-        return JsonResponse(data, safe=False)           
+            elif voto.voto == 'R':
+                tot_favoravel_restricoes += 1
+
+            elif voto.voto == 'A':
+                tot_abstencao += 1
+
+            elif voto.voto == 'V':
+                tot_vista += 1
+
+            votacao.VotoJSONs.append(
+                VotoJSON(voto.vereador.get_full_name(), voto.voto, '', desc_contrario)
+            )
+
+        votacao.TotalJSONs.append(
+            TotalJSON(
+                tot_contrario,
+                tot_favoravel,
+                tot_favoravel_restricoes,
+                tot_abstencao,
+                tot_vista
+            )
+        )
+
+        # ---------------------------
+        # 6. JSON final
+        # ---------------------------
+        data = jsonref.loads(JsonConvert.ToJSON(votacao))
+        return JsonResponse(data, safe=False)
+
+    except Exception as e:
+        logger.error(f"Erro ao montar painel: {e}")
+        return JsonResponse({'erro': str(e)}, status=500)      
 
 # -----------------------------------------------------------------------------------
 # chamada API para retornar usuarios do sistema
@@ -504,3 +605,12 @@ def usuarios(request):
         usuarios_json.append(e_json)
 
     return JsonResponse(usuarios_json, safe=False)
+
+# -----------------------------------------------------------------------------------
+# função auxiliar para tratar projetos votação conjunta
+# -----------------------------------------------------------------------------------
+def trata_votacao_conjunta(lista_projetos):
+    array_json=[]
+
+    for projeto in lista_projetos:
+        array_json.append(formata_projeto(projeto))

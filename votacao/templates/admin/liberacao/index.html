@@ -149,6 +149,10 @@
                     title: "Tipo",
                     data: 'rec_tipo_reuniao',
                 },
+                {
+                    title: "con_id",
+                    data: 'con_id'
+                },
 
             ],
             "columnDefs": [
@@ -175,6 +179,11 @@
                 {
                     "targets": [4],
                     "visible": true,
+                    "searchable": false
+                },
+                {
+                    "targets": [5],
+                    "visible": false,
                     "searchable": false
                 },
 
@@ -211,6 +220,7 @@
             },
             responsive: true,
             "order": [[2, "asc"]],
+            // ADICIONAR CON_ID
             "columns": [
                 {
                     title: "par_id",
@@ -336,11 +346,12 @@
             $(this).removeClass('selected');
         }
         else {
+            
             if (tableReunioes.data().any()) {
                 tableReunioes.$('tr.selected').removeClass('selected');
                 data = tableReunioes.row(this).data();
                 titulo = data['rec_numero'] + " " + data['con_desc'];
-                carregaProjetos(data['pac_id'], titulo);
+                carregaProjetos(data['pac_id'], titulo, data['con_id']);
                 $(this).addClass('selected');
             }
             else {
@@ -350,9 +361,8 @@
         }
     });
 
-    function carregaProjetos(pac_id, titulo) {
-
-        url = "/api/consome_projetos/" + pac_id + "/";
+    function carregaProjetos(pac_id, titulo, con_id) {
+        url = "/api/consome_projetos/" + pac_id + "/" + con_id + "/";
         verifica_aberto();
         $('#tit_reuniao').empty();
         $('#tit_reuniao').append(titulo);

@@ -5,7 +5,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-	#path('', views.AdminIndex.as_view(), name='index'),
+	path('', views.AdminIndex.as_view(), name='index'),
 	path('liberacao/', views.LiberacaoIndex.as_view(), name='liberacao-index'),
 	# path('votacao/', views.VotacaoIndex.as_view(), name='votacao-index'),
 	path('relatorio/votacao/', views.RelatorioVotacaoIndex.as_view(), name='relatorio-votacao'),
@@ -15,4 +15,6 @@ urlpatterns = [
 	path('painel/', views.PainelIndex.as_view(), name='painel-index'),
 	path('gerencia/usuario/', views.AdminUsuariosIndex.as_view(), name='usuario-index'),
 	path('gerencia/usuario/altera/<int:pk>/', views.AdminUsuariosUpdate.as_view(), name='usuario-altera'),
+	
+	path('health/', views.health, name='health'),
 ]	

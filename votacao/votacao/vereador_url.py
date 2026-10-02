@@ -5,5 +5,6 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-	path('', views.VotacaoIndex.as_view(), name='votacao-index'),
+	# path('', views.VotacaoIndex.as_view(), name='votacao-index'),
+  path('vota/', views.VotacaoIndex.as_view(), name='votacao-index'),
 ]	
