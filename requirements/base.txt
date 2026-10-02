@@ -4,7 +4,7 @@ Django==2.2.8
 #Django==1.10.8
 #Django==1.9.13
 
-Markdown==2.6.11
+Markdown==3.8.1
 
 Underscore>=0.0.30000001
 
